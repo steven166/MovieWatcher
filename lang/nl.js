@@ -1,8 +1,10 @@
 var lang_nl = {
     "lang": "Nederlands",
     "language": "Taal",
+    "app-name": "MovieWatcher",
     "cancel": "Annuleren",
     "error-connection": "Probleem met de verbinding",
+    "error": "Er is iets mis gegaan",
 
     "general": "Algemeen",
     "clear-cache": "Verwijder Cache",
@@ -14,7 +16,7 @@ var lang_nl = {
     "powered-by": "Mogelijk gemaakt door",
     "framework": "Framework",
     "watchlist": "Watchlist",
-    "settings": "Settings",
+    "settings": "Instellingen",
     "more": "Meer",
     "genres": "Genres",
 

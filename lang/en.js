@@ -1,8 +1,10 @@
 var lang_en = {
     "lang": "English",
     "language": "Language",
+    "app-name": "MovieWatcher",
     "cancel": "Cancel",
     "error-connection": "Connection error",
+    "error": "Something went wrong",
 
     "general": "General",
     "clear-cache": "Clear Cache",
