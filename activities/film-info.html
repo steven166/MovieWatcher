@@ -194,7 +194,7 @@
             var movieMeta = JSON.parse(movieJSON);
 
             activity.title = movieMeta.title;
-            var imageUrl = API_CONFIG.images.base_url + API_CONFIG.images.logo_sizes[1];
+            var imageUrl = API_CONFIG.default_base_url + API_CONFIG.images.logo_sizes[1];
             if(movieMeta.poster_path != null){
                 imageUrl += movieMeta.poster_path;
                 activity.src = imageUrl;
@@ -299,7 +299,7 @@
                 }
             });
 
-            var imageUrl = API_CONFIG.images.base_url + API_CONFIG.images.poster_sizes[4];
+            var imageUrl = API_CONFIG.default_base_url + API_CONFIG.images.poster_sizes[4];
             var skipImage = false;
             if(movieMeta.poster_path != null){
                 imageUrl += movieMeta.poster_path;

@@ -13,6 +13,7 @@ if(location.protocol === "http:"){
 function getAPIConfig(){
     var getter = $.get(protocol + "api.themoviedb.org/3/configuration", {api_key: API_KEY});
     getter.done(function(json){
+        json["default_base_url"] = (protocol === "https://" ? json.images.secure_base_url : json.images.base_url);
         localStorage.setItem("api_config", JSON.stringify(json));
         API_CONFIG = json;
     });
