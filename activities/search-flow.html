@@ -4,6 +4,16 @@
             left: 64px;
         }
 
+        [activity=search-flow] .paper-list .trail{
+            width: auto;
+        }
+
+        [activity=search-flow] .paper-list .title .sub b{
+            position: relative;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
         [activity=search-flow] .paper-input{
             position: absolute;
             top: 3px;
@@ -48,13 +58,13 @@
         this.onCreate = function(eActivity){
             list = paper.list.create(eActivity, function(li, item, isHeader){
                 if(isHeader){
-                    li.addClass("header").addClass("sep-top");
+                    li.addClass("paper-align header sep-top");
                     li.html(item);
                 }else{
                     li.attr("data-key", item.id);
-                    li.addClass("wrippels").addClass("push-left");
-                    li.addClass("medium");
+                    li.addClass("paper-align medium wrippels");
                     var imageUrl = API_CONFIG.images.base_url + API_CONFIG.images.logo_sizes[1];
+                    var iconHolder = $("<div class='icon fade'></div>").appendTo(li);
                     var skipImage = false;
                     if(item.poster_path != null){
                         imageUrl += item.poster_path;
@@ -64,7 +74,6 @@
                         skipImage = true;
                     }
                     if(!skipImage) {
-                        var iconHolder = $("<div class='icon fade'></div>").appendTo(li);
                         var image = new Image();
                         image.onload = function () {
                             iconHolder.css("background-image", "url(" + imageUrl + ")");
@@ -72,11 +81,16 @@
                         };
                         image.src = imageUrl;
                     }
-                    $("<div class='title main'>" + item.title + "</div>").appendTo(li);
-                    var ratings = $("<div class='title sub'></div>").appendTo(li);
+
+                    var year = new Date(item.release_date).getUTCFullYear();
+                    var title = $("<div class='title push-trail'></div>").appendTo(li);
+                    $("<div class='main'>" + item.title + "</div>").appendTo(title);
+
+                    var sub = $("<div class='sub'><b>" + year + "</b></div>").appendTo(title);
+                    var ratings = $("<div class='trail'></div>").appendTo(li);
                     var r = item.vote_average / 2;
                     for(var i = 0; i < r; i++){
-                        ratings.append("<i class='fg-yellow mdi-action-star-rate' style='font-size:20px;'></i>");
+                        ratings.append("<i class='fg-dark-gray mdi-action-star-rate' style='font-size:20px;'></i>");
                     }
                 }
             });
@@ -110,7 +124,7 @@
                         api_key: API_KEY,
                         query: input
                     };
-                    var getter = activity.get("http://api.themoviedb.org/3/search/movie", params);
+                    var getter = activity.get(protocol + "api.themoviedb.org/3/search/movie", params);
                     getter.done(function(json){
                         for(var i = 0; i < json.results.length; i++){
                             localStorage.setItem("movie-" + json.results[i].id, JSON.stringify(json.results[i]));

@@ -176,6 +176,10 @@
         ];
 
         this.onCreate = function(eActivity, invokeArg){
+            if(downloadEnabled == false){
+                eActivity.find(".film-info-download").remove();
+            }
+
             var urlData = app.getUrlData();
             if(urlData.group === "watchlist"){
                 eActivity.find(".film-info-trailer").addClass("teal").removeClass("blue-gray");
@@ -213,7 +217,7 @@
 
             var done = 0;
 
-            var getter = this.get("http://api.themoviedb.org/3/movie/" + invokeArg, {api_key: API_KEY, append_to_response: "videos", language: paper.lang.getLanguage()});
+            var getter = this.get(protocol + "api.themoviedb.org/3/movie/" + invokeArg, {api_key: API_KEY, append_to_response: "videos", language: paper.lang.getLanguage()});
             getter.done(function(json){
                 done++;
 
@@ -287,8 +291,12 @@
                     activity.loaded();
                 }
             });
-            getter.fail(function(){
-                activity.loaded();
+            getter.fail(function(xhr){
+                if(xhr.status === 0 && xhr.statusText !== "abort"){
+                    activity.onError("error-connection", true);
+                }else{
+                    activity.onError("error", true);
+                }
             });
 
             var imageUrl = API_CONFIG.images.base_url + API_CONFIG.images.poster_sizes[4];

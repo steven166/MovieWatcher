@@ -1,65 +1,62 @@
 CACHE MANIFEST
-# 2015-05-22:v3
+# 2015-10-31:v1
+
 CACHE:
-index.php
+index.html
 
 manifest-app.json
 images/icons/icon-4x.png
+images/icons/icon-3x.png
+images/icons/icon-2x.png
+images/icons/icon-1-5x.png
+images/icons/icon-1x.png
+images/icons/icon-0-75x.png
 
-http://fonts.googleapis.com/css?family=Roboto:400,700
 http://fonts.gstatic.com/s/roboto/v15/CrYjSnGjrRCn0pd9VQsnFOvvDin1pK8aKteLpeZ5c0A.woff
-css/icons/google_icons.woff?-g7cqhn
+http://fonts.gstatic.com/s/roboto/v15/d-6IYplOFocCacKzxwXSOLO3LdcAZYWl9Si6vvxL-qU.woff
 
 css/icons/google_icons.css
 css/icons/google_icons.eot
 css/icons/google_icons.svg
 css/icons/google_icons.ttf
 css/icons/google_icons.woff
+css/icons/google_icons.woff?-g7cqhn
 
-css/paper/paper.css
-css/paper/paper-list.css
-css/paper/paper-header.css
-css/paper/paper-wrippels.css
-css/paper/paper-app.css
-css/paper/paper-snackbar-toast.css
-css/paper/paper-button.css
-css/paper/paper-input.css
-css/paper/paper-modal.css
-css/paper/paper-checkbox.css
-css/paper/styles/paper-styles.css
-css/app.css
-
+css/paperwork.css
 js/jquery.min.js
-js/paper/paper.js
-js/paper/paper-list.js
-js/paper/paper-header.js
-js/paper/paper-wrippels.js
-js/paper/paper-app.js
-js/paper/paper-snackbar-toast.js
-js/paper/paper-input.js
-js/paper/paper-modal.js
-js/paper/paper-checkbox.js
-js/paper/paper-lang.js
-
+js/paperwork.js
+js/app.js
+js/init.js
 lang/en.js
 lang/nl.js
 
-js/app.js
-js/activities/film-info.js
-js/activities/index-drawer.js
-js/activities/index-panel.js
-js/activities/settings.js
-js/activities/settings-about.js
-js/activities/settings-general.js
-js/activities/search-flow.js
-js/activities/watchlist.js
-js/activities/trailer-overlay.js
-js/activities/download.js
-js/activity-groups.js
+activities/download.html
+activities/film-info.html
+activities/index-drawer.html
+activities/index-panel.html
+activities/search-flow.html
+activities/settings.html
+activities/settings-about.html
+activities/settings-download.html
+activities/settings-general.html
+activities/trailer-overlay.html
+activities/watchlist.html
+activities/login.html
 
 images/icons/material.png
-/images/wallpaper2.jpg
+images/wallpaper.jpg
 
 NETWORK:
-services/portal.php
-services/portal-image.php
+http://api.themoviedb.org/3/discover/
+http://api.themoviedb.org/3/movie/
+http://api.themoviedb.org/3/search/
+http://api.themoviedb.org/3/
+http://image.tmdb.org/t/p/w92/
+http://image.tmdb.org/t/p/w500/
+
+https://api.themoviedb.org/3/discover/
+https://api.themoviedb.org/3/movie/
+https://api.themoviedb.org/3/search/
+https://api.themoviedb.org/3/
+https://image.tmdb.org/t/p/w92/
+https://image.tmdb.org/t/p/w500/

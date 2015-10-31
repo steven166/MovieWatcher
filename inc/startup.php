@@ -10,6 +10,8 @@
             margin-top: -32px;
             border-radius: 100%;
             transform: rotate(-90deg);
+            animation: intro 2.5s ease;
+            -webkit-animation: intro 2.5s ease;
         }
 
         #page-loader svg{
@@ -63,6 +65,30 @@
             100% {
                 stroke-dasharray: 90,150; /* 70%, 101% circumference */
                 stroke-dashoffset: -124;  /* -99% circumference */
+            }
+        }
+
+        @keyframes intro{
+            0% {
+                opacity: 0;
+            }
+            50% {
+                opacity: 0;
+            }
+            100% {
+                opacity: 1;
+            }
+        }
+
+        @-webkit-keyframes intro{
+            0% {
+                opacity: 0;
+            }
+            50% {
+                opacity: 0;
+            }
+            100% {
+                opacity: 1;
             }
         }
     </style>

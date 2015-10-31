@@ -1,13 +1,14 @@
 <template activity="watchlist">
     <style>
-        [activity=watchlist] .paper-list .title.sub b{
-            position: relative;
-            top: -2px;
-            font-weight: bold;
+
+        [activity=watchlist] .paper-list .trail{
+            width: auto;
         }
 
-        [activity=watchlist] .paper-list .title.sub span{
-            float:right;
+        [activity=watchlist] .paper-list .title .sub b{
+            position: relative;
+            font-weight: bold;
+            font-size: 14px;
         }
 
     </style>
@@ -21,7 +22,7 @@
                 var assoc = JSON.parse(watchList);
                 var jsonWatchList = [];
                 for(var key in assoc){
-                    if(assoc[key] == true) {
+                    if (assoc[key] == true) {
                         jsonWatchList.push(key);
                     }
                 }
@@ -38,13 +39,15 @@
 
             var list = paper.list.create(eActivity, function(li, id, isHeader){
                 if(isHeader){
-                    li.addClass("header").addClass("sep-top");
-                    li.html(id);
+                    li.addClass("paper-align header sep-top");
+                    li.text(id);
                 }else{
                     var item = JSON.parse(localStorage.getItem("movie-" + id));
+                    if(item == null){
+                        return;
+                    }
                     li.attr("data-key", item.id);
-                    li.addClass("wrippels").addClass("push-left");
-                    li.addClass("medium");
+                    li.addClass("paper-align wrippels medium");
                     var imageUrl = API_CONFIG.images.base_url + API_CONFIG.images.logo_sizes[1];
                     var skipImage = false;
                     if(item.poster_path != null){
@@ -54,8 +57,8 @@
                     }else{
                         skipImage = true;
                     }
+                    var iconHolder = $("<div class='icon fade'></div>").appendTo(li);
                     if(!skipImage) {
-                        var iconHolder = $("<div class='icon fade'></div>").appendTo(li);
                         var image = new Image();
                         image.onload = function () {
                             iconHolder.css("background-image", "url(" + imageUrl + ")");
@@ -65,10 +68,11 @@
                     }
 
                     var year = new Date(item.release_date).getUTCFullYear();
-                    $("<div class='title main'>" + item.title + "</div>").appendTo(li);
+                    var title = $("<div class='title push-trail'></div>").appendTo(li);
+                    $("<div class='main'>" + item.title + "</div>").appendTo(title);
 
-                    var sub = $("<div class='title sub'><b>" + year + "</b></div>").appendTo(li);
-                    var ratings = $("<span></span>").appendTo(sub);
+                    var sub = $("<div class='sub'><b>" + year + "</b></div>").appendTo(title);
+                    var ratings = $("<div class='trail'></div>").appendTo(li);
                     var r = item.vote_average / 2;
                     for(var i = 0; i < r; i++){
                         ratings.append("<i class='fg-dark-gray mdi-action-star-rate' style='font-size:20px;'></i>");

@@ -10,14 +10,14 @@
             text-align: left;
         }
 
-        [activity=index-panel] .paper-list .title.sub b{
-            position: relative;
-            top: -2px;
-            font-weight: bold;
+        [activity=index-panel] .paper-list .trail{
+            width: auto;
         }
 
-        [activity=index-panel] .paper-list .title.sub span{
-            float:right;
+        [activity=index-panel] .paper-list .title .sub b{
+            position: relative;
+            font-weight: bold;
+            font-size: 14px;
         }
 
         [activity=index-panel] .bottom-wrapper{
@@ -112,7 +112,7 @@
                 params["with_genres"] = iArg;
             }
 
-            var getter = this.get("http://api.themoviedb.org/3/discover/movie", params);
+            var getter = this.get(protocol + "api.themoviedb.org/3/discover/movie", params);
             getter.done(function(json){
 
                 pages = json.total_pages;
@@ -136,18 +136,21 @@
                 list.render(movieList);
                 activity.loaded();
             });
-            getter.fail(function(){
-                activity.loaded();
+            getter.fail(function(xhr){
+                if(xhr.status === 0 && xhr.statusText !== "abort"){
+                    activity.onError("error-connection", true);
+                }else{
+                    activity.onError("error", true);
+                }
             });
 
             list = paper.list.create(eActivity, function(li, item, isHeader){
                 if(isHeader){
-                    li.addClass("header").addClass("sep-top");
+                    li.addClass("paper-align header sep-top");
                     li.html(item);
                 }else{
                     li.attr("data-key", item.id);
-                    li.addClass("wrippels").addClass("push-left");
-                    li.addClass("medium");
+                    li.addClass("paper-align medium wrippels");
                     var imageUrl = API_CONFIG.images.base_url + API_CONFIG.images.logo_sizes[1];
                     var skipImage = false;
                     if(item.poster_path != null){
@@ -168,10 +171,11 @@
                     }
 
                     var year = new Date(item.release_date).getUTCFullYear();
-                    $("<div class='title main'>" + item.title + "</div>").appendTo(li);
+                    var title = $("<div class='title push-trail'></div>").appendTo(li);
+                    $("<div class='main'>" + item.title + "</div>").appendTo(title);
 
-                    var sub = $("<div class='title sub'><b>" + year + "</b></div>").appendTo(li);
-                    var ratings = $("<span></span>").appendTo(sub);
+                    var sub = $("<div class='sub'><b>" + year + "</b></div>").appendTo(title);
+                    var ratings = $("<div class='trail'></div>").appendTo(li);
                     var r = item.vote_average / 2;
                     for(var i = 0; i < r; i++){
                         ratings.append("<i class='fg-dark-gray mdi-action-star-rate' style='font-size:20px;'></i>");
@@ -227,7 +231,7 @@
                 if(typeof(iArg) !== "undefined" && iArg != null){
                     params["with_genres"] = iArg;
                 }
-                var getter = activity.get("http://api.themoviedb.org/3/discover/movie", params);
+                var getter = activity.get(protocol + "api.themoviedb.org/3/discover/movie", params);
                 getter.done(function(json){
                     var movieList = {};
                     for(var i = 0; i < json.results.length; i++){

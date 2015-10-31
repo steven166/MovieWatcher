@@ -1,11 +1,15 @@
 <template activity="settings">
     <ul class="paper-list">
-        <li class="wrippels sep-bottom medium push-left" id="setting-action-general">
-            <div class="icon fg-teal"><i class="mdi-action-settings"></i></div>
+        <li class="paper-align wrippels sep-bottom medium" id="setting-action-general">
+            <div class="icon full fg-teal"><i class="mdi-action-settings"></i></div>
             <div class="title" lang-key="general"></div>
         </li>
-        <li class="wrippels sep-bottom medium push-left" id="setting-action-about">
-            <div class="icon fg-teal"><i class="mdi-action-info-outline"></i></div>
+        <li class="paper-align wrippels sep-bottom medium" id="setting-action-download">
+            <div class="icon full fg-teal"><i class="mdi-file-file-download"></i></div>
+            <div class="title" lang-key="download-server"></div>
+        </li>
+        <li class="paper-align wrippels sep-bottom medium" id="setting-action-about">
+            <div class="icon full fg-teal"><i class="mdi-action-info-outline"></i></div>
             <div class="title" lang-key="about"></div>
         </li>
     </ul>
@@ -13,9 +17,21 @@
 <script>
     app.activity("settings", function(){
 
+        this.onCreate = function(eActivity){
+            if(downloadEnabled == false){
+                eActivity.find("#setting-action-download").remove();
+            }
+        }
+
         $("body").on("click", "[activity=settings] #setting-action-general", function(){
             setTimeout(function(){
                 app.goToActivity("settings-general", 2);
+            }, 300);
+        });
+
+        $("body").on("click", "[activity=settings] #setting-action-download", function(){
+            setTimeout(function(){
+                app.goToActivity("settings-download", 2);
             }, 300);
         });
 

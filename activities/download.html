@@ -1,3 +1,4 @@
+<html>
 <template activity="download">
     <style>
         [activity=download] .paper-header .title{
@@ -33,7 +34,6 @@
 
             var getter = this.get("services/download-service.php", {imdb: invokeArg});
 
-            //var getter = $.get("http://82.176.111.248:50080/services/download-service.php", {imdb: invokeArg});
             getter.done(function(json){
                 var list = paper.list.create(eActivity, function(li, item, isHeader){
                     if(isHeader){
@@ -71,6 +71,14 @@
                 activity.loaded();
             });
 
+            getter.fail(function(xhr){
+                if(xhr.status === 0 && xhr.statusText !== "abort"){
+                    activity.onError("error-connection", true);
+                }else{
+                    activity.onError("error", true);
+                }
+            });
+
             return false;
         };
 
@@ -80,3 +88,4 @@
 
     });
 </script>
+</html>

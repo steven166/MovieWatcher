@@ -1,0 +1,67 @@
+<template activity="login">
+    <form class="paper-form" onsubmit="return false">
+        <div class="paper-input paper-label">
+            <label>Username</label>
+            <input type="text" name="username" required/>
+            <div class="stat"></div>
+            <div class="stat-active"></div>
+        </div>
+        <div class="paper-input paper-label">
+            <label>Password</label>
+            <input type="password" name="password" required/>
+            <div class="stat"></div>
+            <div class="stat-active"></div>
+        </div>
+        <div class="form-control">
+            <button class="paper-button wrippels" type="submit">Login</button>
+            <div class="paper-loading small hide"></div>
+            <span class="fg-red" id="error-label"></span>
+        </div>
+    </form>
+</template>
+<script>
+    app.activity("login", function(){
+
+        this.title = "Login";
+        var activity = this;
+
+        this.onCreate = function(eActivity){
+            eActivity.find("button").click(function(){
+                eActivity.find("form").submit();
+            });
+            eActivity.find("form").submit(function(){
+                $(this).find("#error-label").text("");
+                var username = $(this).find("[name=username]").val();
+                var password = $(this).find("[name=password]").val();
+                if(username === "" || typeof(username) === "undefined"){
+                    $(this).find("#error-label").text(paper.lang.get("login.no-username"));
+                }else if(password === "" || typeof(password) === "undefined"){
+                    $(this).find("#error-label").text(paper.lang.get("login.no-password"));
+                }else{
+                    $(this).find(".paper-loading").removeClass("hide");
+                    var posting = activity.post("login.json", {username: username, password: password});
+                    posting.done(function(result){
+                        if(result.authorized === true){
+                            var key = result.sessionKey;
+                            if(key != null){
+                                localStorage.setItem("session.key", key);
+                                app.back();
+                            }else{
+                                console.error("No session key received");
+                                activity.element.find("#error-label").text(paper.lang.get("error"));
+                            }
+                        }else{
+                            activity.element.find("#error-label").text(paper.lang.get("login.fail"));
+                        }
+                    });
+                    posting.always(function(){
+                        activity.element.find(".paper-loading").addClass("hide");
+                    });
+                }
+            });
+
+
+        };
+
+    });
+</script>

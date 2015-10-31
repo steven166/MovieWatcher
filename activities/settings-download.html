@@ -1,0 +1,184 @@
+<template activity="settings-download">
+    <style>
+        [activity="settings-download"] .title .sub{
+            font-size: 14px !important;
+            opacity: 1;
+            top: -5px !important;
+        }
+
+        [activity="settings-download"] .title .sub:not(.fg-red):not(.fg-green){
+            color: rgb(108, 108, 108);
+        }
+
+        [activity="settings-download"] .trail.fade{
+            opacity: 0;
+        }
+    </style>
+    <ul class="paper-list">
+        <li class="paper-align sep-bottom wrippels medium" id="download-host">
+            <div class="title">
+                <div class="main" lang-key="download-host"></div>
+                <div class="sub"></div>
+            </div>
+        </li>
+        <li class="paper-align sep-bottom wrippels medium" id="download-username">
+            <div class="title">
+                <div class="main" lang-key="download-username"></div>
+                <div class="sub"></div>
+            </div>
+        </li>
+        <li class="paper-align sep-bottom wrippels medium" id="download-password">
+            <div class="title">
+                <div class="main" lang-key="download-password"></div>
+                <div class="sub"></div>
+            </div>
+        </li>
+        <li class="paper-align sep-bottom wrippels medium" id="download-test">
+            <div class="title">
+                <div class="main" lang-key="download-test"></div>
+                <div class="sub" lang-key="download-test-connection"></div>
+            </div>
+            <div class="trail fade">
+                <div class="paper-loading small"></div>
+            </div>
+        </li>
+    </ul>
+</template>
+<script>
+    app.activity("settings-download", function () {
+
+        this.title = "@+download-server+@";
+        var activity = this;
+
+        var downloadHostKey = "download-server.host";
+        var downloadUsernameKey = "download-server.username";
+        var downloadPasswordKey = "download-server.password";
+
+        this.onCreate = function(eActivity, invokeUrl){
+            var host = window.localStorage.getItem(downloadHostKey);
+            var username = window.localStorage.getItem(downloadUsernameKey);
+            var password = window.localStorage.getItem(downloadPasswordKey);
+            if(host == null || host === ""){
+                eActivity.find("#download-host").find(".sub").text(paper.lang.get("download-field-empty"));
+            }else{
+                eActivity.find("#download-host").find(".sub").text(host);
+            }
+            if(username == null || username === ""){
+                eActivity.find("#download-username").find(".sub").text(paper.lang.get("download-field-empty"));
+            }else{
+                try {
+                    eActivity.find("#download-username").find(".sub").text(atob(username));
+                }catch(e){
+                    console.error("Could not read username");
+                    eActivity.find("#download-username").find(".sub").text(paper.lang.get("download-field-empty"));
+                }
+            }
+            if(password == null || password === ""){
+                eActivity.find("#download-password").find(".sub").text(paper.lang.get("download-field-empty"));
+            }else {
+                try {
+                    var dPassword = atob(password);
+                    var pw = "";
+                    for (var i = 0; i < dPassword.length; i++) {
+                        pw += "*";
+                    }
+                    eActivity.find("#download-password").find(".sub").text(pw);
+                } catch (e) {
+                    console.error("Could not read password");
+                    eActivity.find("#download-password").find(".sub").text(paper.lang.get("download-field-empty"));
+                }
+            }
+
+            eActivity.find("#download-host").click(function(){
+                paper.alert.input(paper.lang.get("download-host"), window.localStorage.getItem(downloadHostKey), paper.lang.get("download-host"), false, function(host){
+                    window.localStorage.setItem(downloadHostKey, host);
+                    activity.element.find("#download-test .sub").text(paper.lang.get("download-test-connection")).removeClass("fg-red").removeClass("fg-green");
+                    if(host == null || host === ""){
+                        eActivity.find("#download-host").find(".sub").text(paper.lang.get("download-field-empty"));
+                    }else{
+                        eActivity.find("#download-host").find(".sub").text(host);
+                    }
+                });
+            });
+
+            eActivity.find("#download-username").click(function(){
+                var username = "";
+                try{
+                    username = atob(window.localStorage.getItem(downloadUsernameKey));
+                }catch(e){
+                    console.error("Could not read username");
+                }
+                paper.alert.input(paper.lang.get("download-username"), username, paper.lang.get("download-username"), false, function(username){
+                    window.localStorage.setItem(downloadUsernameKey, btoa(username));
+                    activity.element.find("#download-test .sub").text(paper.lang.get("download-test-connection")).removeClass("fg-red").removeClass("fg-green");
+                    if(username == null || username === ""){
+                        eActivity.find("#download-username").find(".sub").text(paper.lang.get("download-field-empty"));
+                    }else{
+                        eActivity.find("#download-username").find(".sub").text(username);
+                    }
+                });
+            });
+
+            eActivity.find("#download-password").click(function(){
+                paper.alert.input(paper.lang.get("download-password"), "", paper.lang.get("download-password"), false, function(password){
+                    window.localStorage.setItem(downloadPasswordKey, btoa(password));
+                    activity.element.find("#download-test .sub").text(paper.lang.get("download-test-connection")).removeClass("fg-red").removeClass("fg-green");
+                    if(password == null || password === ""){
+                        eActivity.find("#download-password").find(".sub").text(paper.lang.get("download-field-empty"));
+                    }else{
+                        var pw = "";
+                        for(var i = 0; i < password.length; i++){
+                            pw += "*";
+                        }
+                        eActivity.find("#download-password").find(".sub").text(pw);
+                    }
+                });
+            });
+
+            eActivity.find("#download-test").click(function(){
+                var sub = $(this).find(".sub");
+                sub.text(paper.lang.get("download-testing")).removeClass("fg-red");
+                $(this).find(".trail").removeClass("fade");
+                var host = window.localStorage.getItem(downloadHostKey);
+                var username = window.localStorage.getItem(downloadUsernameKey);
+                var password = window.localStorage.getItem(downloadPasswordKey);
+                try{
+                    username = atob(username);
+                    password = atob(password);
+                }catch(e){
+                    console.error("Could not read username or password");
+                    sub.text(paper.lang.get("download-wrong-auth")).addClass("fg-red");
+                    $(this).find(".trail").addClass("fade");
+                }
+                var credentials = btoa(username + ":" + password);
+                if(host == null || host === ""){
+                    sub.text(paper.lang.get("download-host-not-set")).addClass("fg-red");
+                    $(this).find(".trail").addClass("fade");
+                }else{
+                    var posting = activity.post("/download/token", {
+                        key: localStorage.getItem(keyName),
+                        host: host,
+                        credentials: credentials
+                    });
+                    posting.done(function(result){
+                        if(result.succeed === true){
+                            sub.text(paper.lang.get("succeed"));
+                            sub.removeClass("fg-red").addClass("fg-green");
+                        }else if(result.message != null && typeof(result.message) !== "undefined" && typeof(paper.lang.get("download-" + result.message)) !== "undefined"){
+                            sub.text(paper.lang.get("download-" + result.message)).addClass("fg-red");
+                        }else{
+                            sub.text(paper.lang.get("error")).addClass("fg-red");
+                        }
+                    });
+                    posting.fail(function(result){
+                        sub.text(paper.lang.get("error")).addClass("fg-red");
+                    });
+                    posting.always(function(){
+                        activity.element.find("#download-test .trail").addClass("fade");
+                    });
+                }
+            });
+        };
+
+    });
+</script>

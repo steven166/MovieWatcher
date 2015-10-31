@@ -1,27 +1,52 @@
 <template activity="settings-about">
+    <style>
+        [activity="settings-about"] .title .sub{
+            font-size: 14px !important;
+            opacity: 1;
+            color: rgb(108, 108, 108);
+            top: -5px !important;
+        }
+    </style>
     <ul class="paper-list">
-        <li class="sep-bottom medium">
-            <div class="title main" lang-key="version"></div>
-            <div class="title sub">1.01</div>
+        <li class="paper-align sep-bottom medium">
+            <div class="title">
+                <div class="main" lang-key="version"></div>
+                <div class="sub">1.01</div>
+            </div>
         </li>
-        <li class="sep-bottom medium">
-            <div class="title main" lang-key="author"></div>
-            <div class="title sub">Steven Hermans</div>
+        <li class="paper-align sep-bottom medium">
+            <div class="title">
+                <div class="main" lang-key="author"></div>
+                <div class="sub">Steven Hermans</div>
+            </div>
         </li>
-        <li class="sep-bottom wrippels medium">
-            <div class="title main" lang-key="powered-by"></div>
-            <div class="title sub">The Movie Database</div>
+        <li class="paper-align sep-bottom wrippels medium" id="tmdb-link">
+            <div class="title">
+                <div class="main" lang-key="powered-by"></div>
+                <div class="sub">The Movie Database</div>
+            </div>
         </li>
-        <li class="sep-bottom wrippels medium">
-            <div class="title main" lang-key="framework"></div>
-            <div class="title sub">PaperWork 0.1.0</div>
+        <li class="paper-align sep-bottom wrippels medium" id="paperwork-link">
+            <div class="title">
+                <div class="main" lang-key="framework"></div>
+                <div class="sub">PaperWork 0.1.0</div>
+            </div>
         </li>
     </ul>
 </template>
 <script>
-    app.activity("settings-about", function(){
+    app.activity("settings-about", function () {
 
         this.title = "@+about+@";
+
+        this.onCreate = function(eActivity){
+            eActivity.find("#tmdb-link").click(function(){
+                window.open('https://www.themoviedb.org', '_blank');
+            });
+            eActivity.find("#paperwork-link").click(function(){
+                window.open('https://steven166.github.io/paperwork/api.html', '_blank');
+            });
+        };
 
     });
 </script>
