@@ -42,7 +42,7 @@ if(API_CONFIG == null){
 
 paper.lang.setSupportedLanguages(["en", "nl"]);
 
-var app = paper.app.create(false, "dark-gray", "paperwork_icon");
+var app = paper.app.create(false, "black", "paperwork_icon");
 
 paper.app.errorHandlers.error = function(jqXHR, textStatus, errorThrown){
     paper.toast(paper.lang.get("error"));

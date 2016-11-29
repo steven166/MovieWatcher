@@ -21,45 +21,64 @@
       font-size: 14px;
     }
 
-    [activity=index-panel] .paper-list li{
+    [activity=index-panel] .paper-list li {
       display: inline-block;
       width: 150px;
       height: 250px;
     }
 
-    [activity=index-panel] .paper-list li .icon{
+    [activity=index-panel] .paper-list li .icon {
       border-radius: 0;
       width: 130px;
       height: 200px;
       box-shadow: rgba(0, 0, 0, 0.227451) 0px 6px 10px 0px, rgba(0, 0, 0, 0.188235) 0px 10px 30px 0px;
     }
 
-    [activity=index-panel] .paper-list li .title{
+    [activity=index-panel] .paper-list li .title {
       left: 20px !important;
       right: 20px !important;
       top: 200px;
       text-align: center;
     }
 
-    [activity=index-panel][pos="xxo"] .paper-list li, [activity=index-panel][pos="xxx"] .paper-list li{
+    [activity=index-panel][pos="xxx"] .paper-list li {
       display: inline-block;
       width: 300px;
       height: 500px;
     }
 
-    [activity=index-panel][pos="xxo"] .paper-list li .icon, [activity=index-panel][pos="xxx"] .paper-list li .icon{
+    [activity=index-panel][pos="xxx"] .paper-list li .icon {
       border-radius: 0;
       width: 260px;
       height: 400px;
+      left: 20px;
       box-shadow: rgba(0, 0, 0, 0.227451) 0px 6px 10px 0px, rgba(0, 0, 0, 0.188235) 0px 10px 30px 0px;
     }
 
-    [activity=index-panel][pos="xxo"] .paper-list li .title,[activity=index-panel][pos="xxx"] .paper-list li .title{
-      top: 400px;
+    [activity=index-panel][pos="xxx"] .paper-list li .title {
+      top: 410px;
     }
 
-    [activity=index-panel][pos="xxo"] .paper-list li .trail,[activity=index-panel][pos="xxx"] .paper-list li .trail{
+    [activity=index-panel][pos="xxo"] .paper-list li .trail, [activity=index-panel][pos="xxx"] .paper-list li .trail {
       right: 20px;
+    }
+
+    [activity=index-panel][pos="xxo"] .paper-list li {
+      display: inline-block;
+      width: 200px;
+      height: 333px;
+    }
+
+    [activity=index-panel][pos="xxo"] .paper-list li .icon {
+      border-radius: 0;
+      width: 160px;
+      height: 260px;
+      left: 20px;
+      box-shadow: rgba(0, 0, 0, 0.227451) 0px 6px 10px 0px, rgba(0, 0, 0, 0.188235) 0px 10px 30px 0px;
+    }
+
+    [activity=index-panel][pos="xxo"] .paper-list li .title {
+      top: 260px;
     }
 
     [activity=index-panel] .bottom-wrapper {
@@ -96,7 +115,7 @@
   </style>
   <ul class="paper-list"></ul>
   <div class="bottom-wrapper">
-    <div class="paper-button list-more wrippels white" lang-key="more">More</div>
+    <div class="paper-button list-more wrippels gray" lang-key="more">More</div>
     <div class="paper-loading small fade">
       <svg viewBox="0 0 52 52">
         <circle cx="26px" cy="26px" r="20px" fill="none" stroke-width="4px"/>
@@ -112,6 +131,7 @@
     var list;
     var pages = 0;
     var currentPage = 0;
+    var reloading = false;
 
     this.title = undefined;
     this.actions = [
@@ -197,6 +217,13 @@
         }
       });
       this.refreshList();
+
+      eActivity.scroll(function (e) {
+        if (($(this).children().height() - $(this).height() - this.scrollTop) < 100) {
+          activity.loadNewPage();
+        }
+      });
+
       return false;
     };
 
@@ -204,50 +231,55 @@
       activity.refreshList();
     };
 
-    this.refreshList = function() {
-      var params = {api_key: API_KEY, language: paper.lang.getLanguage()};
-      Object.assign(params, filter);
-      if (typeof(iArg) !== "undefined" && iArg != null) {
-        params["with_genres"] = iArg;
-      }
-      if(!params['primary_release_date.lte']){
-        delete params['primary_release_date.lte'];
-      }
-      if(!params['primary_release_date.gte']){
-        delete params['primary_release_date.gte'];
-      }
-
-      var getter = this.get(protocol + "api.themoviedb.org/3/discover/movie", params);
-      getter.done(function (json) {
-
-        pages = json.total_pages;
-        currentPage = 1;
-
-        var movieList = [];
-        for (var i = 0; i < json.results.length; i++) {
-          var r = json.results[i];
-          var newJSON = {
-            id: r.id,
-            backdrop_path: r.backdrop_path,
-            title: r.title,
-            vote_average: r.vote_average,
-            release_date: r.release_date,
-            poster_path: r.poster_path
-          };
-          movieList.push(newJSON);
-          localStorage.setItem("movie-" + r.id, JSON.stringify(newJSON));
+    this.refreshList = function () {
+      if (!reloading) {
+        reloading = true;
+        var params = {api_key: API_KEY, language: paper.lang.getLanguage()};
+        Object.assign(params, filter);
+        if (typeof(iArg) !== "undefined" && iArg != null) {
+          params["with_genres"] = iArg;
+        }
+        if (!params['primary_release_date.lte']) {
+          delete params['primary_release_date.lte'];
+        }
+        if (!params['primary_release_date.gte']) {
+          delete params['primary_release_date.gte'];
         }
 
-        list.render(movieList);
-        activity.loaded();
-      });
-      getter.fail(function (xhr) {
-        if (xhr.status === 0 && xhr.statusText !== "abort") {
-          activity.onError("error-connection", true);
-        } else {
-          activity.onError("error", true);
-        }
-      });
+        var getter = this.get(protocol + "api.themoviedb.org/3/discover/movie", params);
+        getter.done(function (json) {
+
+          pages = json.total_pages;
+          currentPage = 1;
+
+          var movieList = [];
+          for (var i = 0; i < json.results.length; i++) {
+            var r = json.results[i];
+            var newJSON = {
+              id: r.id,
+              backdrop_path: r.backdrop_path,
+              title: r.title,
+              vote_average: r.vote_average,
+              release_date: r.release_date,
+              poster_path: r.poster_path
+            };
+            movieList.push(newJSON);
+            localStorage.setItem("movie-" + r.id, JSON.stringify(newJSON));
+          }
+
+          list.render(movieList);
+          activity.loaded();
+          reloading = false;
+        });
+        getter.fail(function (xhr) {
+          reloading = false;
+          if (xhr.status === 0 && xhr.statusText !== "abort") {
+            activity.onError("error-connection", true);
+          } else {
+            activity.onError("error", true);
+          }
+        });
+      }
     };
 
     $("body").on("navigate", function (event, url, urlData) {
@@ -290,38 +322,48 @@
     });
 
     $("body").on("click", "[activity=index-panel] .list-more", function () {
-      var tthis = this;
-      if (!$(this).hasClass("fade")) {
-        $(this).addClass("fade");
-        $(this).next().removeClass("fade");
-        currentPage++;
-        var params = {api_key: API_KEY, language: paper.lang.getLanguage(), page: currentPage};
-        Object.assign(params, filter);
-        if (typeof(iArg) !== "undefined" && iArg != null) {
-          params["with_genres"] = iArg;
-        }
-        if(!params['primary_release_date.lte']){
-          delete params['primary_release_date.lte'];
-        }
-        if(!params['primary_release_date.gte']){
-          delete params['primary_release_date.gte'];
-        }
-        var getter = activity.get(protocol + "api.themoviedb.org/3/discover/movie", params);
-        getter.done(function (json) {
-          var movieList = {};
-          for (var i = 0; i < json.results.length; i++) {
-            var r = json.results[i];
-            movieList[r.id] = r;
-            localStorage.setItem("movie-" + r.id, JSON.stringify(r));
-          }
-
-          list.append(json.results, 0);
-          $(tthis).removeClass("fade");
-          $(tthis).next().addClass("fade");
-        });
-      }
-
+      loadNewPage();
     });
+
+    this.loadNewPage = function(){
+      if (!reloading) {
+        reloading = true;
+        var button = activity.element.find('.list-more');
+        if (!$(button).hasClass("fade")) {
+          $(button).addClass("fade");
+          $(button).next().removeClass("fade");
+          currentPage++;
+          var params = {api_key: API_KEY, language: paper.lang.getLanguage(), page: currentPage};
+          Object.assign(params, filter);
+          if (typeof(iArg) !== "undefined" && iArg != null) {
+            params["with_genres"] = iArg;
+          }
+          if (!params['primary_release_date.lte']) {
+            delete params['primary_release_date.lte'];
+          }
+          if (!params['primary_release_date.gte']) {
+            delete params['primary_release_date.gte'];
+          }
+          var getter = activity.get(protocol + "api.themoviedb.org/3/discover/movie", params);
+          getter.done(function (json) {
+            var movieList = {};
+            for (var i = 0; i < json.results.length; i++) {
+              var r = json.results[i];
+              movieList[r.id] = r;
+              localStorage.setItem("movie-" + r.id, JSON.stringify(r));
+            }
+
+            list.append(json.results, 0);
+            $(button).removeClass("fade");
+            $(button).next().addClass("fade");
+            reloading = false;
+          });
+          getter.fail(function(){
+            reloading = false;
+          });
+        }
+      }
+    };
 
   });
 </script>

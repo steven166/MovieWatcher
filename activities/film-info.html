@@ -100,7 +100,7 @@
             padding-bottom: 20px;
             font-size: 18px;
             font-weight: bold;
-            color: rgb(70,70,70);
+            color: rgb(140,140,140);
             text-align: left;
             vertical-align: top;
         }
@@ -229,7 +229,7 @@
                 var eRatings = eActivity.find(".film-info-rating");
                 var r = json.vote_average / 2;
                 for(var i = 0; i < r; i++){
-                    eRatings.append("<i class='fg-dark-gray mdi-action-star-rate'></i>");
+                    eRatings.append("<i class='fg-yellow mdi-action-star-rate'></i>");
                 }
 
                 imdb = json.imdb_id;
