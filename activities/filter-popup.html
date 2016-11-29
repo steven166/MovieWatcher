@@ -1,0 +1,123 @@
+<template activity="filter-popup">
+  <style>
+    #filter-adult .paper-checkbox-container{
+      position: absolute;
+      top: 5px;
+      left: 0px;
+    }
+    #filter-adult .paper-checkbox:checked + .box::before{
+      top: 12px;
+      left: 4px;
+    }
+    #filter-sort select{
+      position: absolute;
+      left: -100px;
+      top: 0;
+      bottom: 0;
+      border: none;
+      background: none;
+      outline: none;
+      cursor: pointer;
+      font-size: 15px;
+      width: 150px;
+    }
+    #filter-start-date input, #filter-end-date input{
+      position: absolute;
+      left: -100px;
+      top: 0;
+      bottom: 0;
+      border: none;
+      background: none;
+      outline: none;
+      cursor: pointer;
+    }
+  </style>
+
+  <ul class="paper-list">
+    <li class="paper-align sep-bottom medium" id="filter-adult">
+      <div class="title" lang-key="filter-adult">
+      </div>
+      <div class="trail">
+        <div class="paper-checkbox-container">
+          <input class="paper-checkbox" type="checkbox" />
+          <div class='box'><div class='wrippels'></div></div>
+        </div>
+      </div>
+    </li>
+    <li class="paper-align sep-bottom medium" id="filter-sort">
+      <div class="title" lang-key="filter-sort">
+      </div>
+      <div class="trail">
+        <select>
+          <option value="popularity.desc">Popularity</option>
+          <option value="release_date.desc">Release date</option>
+          <option value="revenue.desc">Revenue</option>
+          <option value="original_title.asc">Title asc</option>
+          <option value="original_title.desc">Title desc</option>
+          <option value="vote_average.desc">Vote average</option>
+          <option value="vote_count.desc">Vote count</option>
+        </select>
+      </div>
+    </li>
+    <li class="paper-align sep-bottom medium" id="filter-start-date">
+      <div class="title" lang-key="filter-start-date">
+      </div>
+      <div class="trail">
+        <input type="date" />
+      </div>
+    </li>
+    <li class="paper-align sep-bottom medium" id="filter-end-date">
+      <div class="title" lang-key="filter-end-date">
+      </div>
+      <div class="trail">
+        <input type="date" />
+      </div>
+    </li>
+  </ul>
+</template>
+
+<script>
+  app.activity("filter-popup", function () {
+
+    this.title = '@+filters+@';
+
+    this.onCreate = function (eActivity, invokeArg) {
+
+      eActivity.find("#filter-adult").find(".paper-checkbox").prop('checked', filter.include_adult);
+      eActivity.find("#filter-sort").find('select').val(filter.sort_by);
+      if(filter['primary_release_date.gte']){
+        eActivity.find("#filter-start-date").find('input').val(filter['primary_release_date.gte']);
+      }
+      if(filter['primary_release_date.lte']){
+        eActivity.find("#filter-end-date").find('input').val(filter['primary_release_date.lte']);
+      }
+
+      eActivity.find("#filter-adult").find(".paper-checkbox-container").click(function(){
+        filter.include_adult = $(this).is(':checked');
+        saveFilters();
+      });
+
+      eActivity.find("#filter-sort").find('select').change(function(){
+        filter.sort_by = $(this).val();
+        saveFilters();
+      });
+
+      eActivity.find("#filter-start-date").find('input').change(function(){
+        filter['primary_release_date.gte'] = $(this).val();
+        saveFilters();
+      });
+
+      eActivity.find("#filter-end-date").find('input').change(function(){
+        filter['primary_release_date.lte'] = $(this).val();
+        saveFilters();
+      });
+
+      return true;
+    };
+
+    function saveFilters(){
+      localStorage.setItem('discover.filter', JSON.stringify(filter));
+      filterRefreshCallback();
+    }
+  });
+</script>

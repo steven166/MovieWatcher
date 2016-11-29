@@ -1,252 +1,327 @@
 <template activity="index-panel">
-    <style>
-        [activity=index-panel] .activity-body{
-            text-align: center;
-        }
+  <style>
+    [activity=index-panel] .activity-body {
+      text-align: center;
+    }
 
-        [activity=index-panel] .paper-list{
-            overflow: initial;
-            height: auto;
-            text-align: left;
-        }
+    [activity=index-panel] .paper-list {
+      overflow: initial;
+      height: auto;
+      text-align: center;
+    }
 
-        [activity=index-panel] .paper-list .trail{
-            width: auto;
-        }
+    [activity=index-panel] .paper-list .trail {
+      width: auto;
+      cursor: pointer;
+    }
 
-        [activity=index-panel] .paper-list .title .sub b{
-            position: relative;
-            font-weight: bold;
-            font-size: 14px;
-        }
+    [activity=index-panel] .paper-list .title .sub b {
+      position: relative;
+      font-weight: bold;
+      font-size: 14px;
+    }
 
-        [activity=index-panel] .bottom-wrapper{
-            position: relative;
-            height: 40px;
-            width: 100%;
-        }
+    [activity=index-panel] .paper-list li{
+      display: inline-block;
+      width: 150px;
+      height: 250px;
+    }
 
-        [activity=index-panel] .list-more{
-            position: absolute;
-            left: 0;
-            width: 100%;
-            margin: 0;
-        }
+    [activity=index-panel] .paper-list li .icon{
+      border-radius: 0;
+      width: 130px;
+      height: 200px;
+      box-shadow: rgba(0, 0, 0, 0.227451) 0px 6px 10px 0px, rgba(0, 0, 0, 0.188235) 0px 10px 30px 0px;
+    }
 
-        [activity=index-panel] .paper-loading{
-            position: absolute;
-            display: inline-block;
-            left: 50%;
-            margin-left: -16px;
-        }
+    [activity=index-panel] .paper-list li .title{
+      left: 20px !important;
+      right: 20px !important;
+      top: 200px;
+      text-align: center;
+    }
 
-        [activity=index-panel] .list-more, .paper-loading{
-            opacity: 1;
-            transition: 0.2s opacity;
-        }
+    [activity=index-panel][pos="xxo"] .paper-list li, [activity=index-panel][pos="xxx"] .paper-list li{
+      display: inline-block;
+      width: 300px;
+      height: 500px;
+    }
 
-        [activity=index-panel] .list-more.fade, .paper-loading.fade{
-            opacity: 0;
-            cursor: default;
-        }
-    </style>
-    <ul class="paper-list"></ul>
-    <div class="bottom-wrapper">
-        <div class="paper-button list-more wrippels white" lang-key="more">More</div>
-        <div class="paper-loading small fade">
-            <svg viewBox="0 0 52 52">
-                <circle cx="26px" cy="26px" r="20px" fill="none" stroke-width="4px" />
-            </svg>
-        </div>
+    [activity=index-panel][pos="xxo"] .paper-list li .icon, [activity=index-panel][pos="xxx"] .paper-list li .icon{
+      border-radius: 0;
+      width: 260px;
+      height: 400px;
+      box-shadow: rgba(0, 0, 0, 0.227451) 0px 6px 10px 0px, rgba(0, 0, 0, 0.188235) 0px 10px 30px 0px;
+    }
+
+    [activity=index-panel][pos="xxo"] .paper-list li .title,[activity=index-panel][pos="xxx"] .paper-list li .title{
+      top: 400px;
+    }
+
+    [activity=index-panel][pos="xxo"] .paper-list li .trail,[activity=index-panel][pos="xxx"] .paper-list li .trail{
+      right: 20px;
+    }
+
+    [activity=index-panel] .bottom-wrapper {
+      position: relative;
+      float: left;
+      height: 40px;
+      width: 100%;
+      margin-top: 10px;
+    }
+
+    [activity=index-panel] .list-more {
+      position: absolute;
+      left: 0;
+      width: 100%;
+      margin: 0;
+    }
+
+    [activity=index-panel] .paper-loading {
+      position: absolute;
+      display: inline-block;
+      left: 50%;
+      margin-left: -16px;
+    }
+
+    [activity=index-panel] .list-more, .paper-loading {
+      opacity: 1;
+      transition: 0.2s opacity;
+    }
+
+    [activity=index-panel] .list-more.fade, .paper-loading.fade {
+      opacity: 0;
+      cursor: default;
+    }
+  </style>
+  <ul class="paper-list"></ul>
+  <div class="bottom-wrapper">
+    <div class="paper-button list-more wrippels white" lang-key="more">More</div>
+    <div class="paper-loading small fade">
+      <svg viewBox="0 0 52 52">
+        <circle cx="26px" cy="26px" r="20px" fill="none" stroke-width="4px"/>
+      </svg>
     </div>
+  </div>
 </template>
 <script>
-    app.activity("index-panel", function(){
+  app.activity("index-panel", function () {
 
-        var activity = this;
-        var iArg = undefined;
-        var list;
-        var pages = 0;
-        var currentPage = 0;
+    var activity = this;
+    var iArg = undefined;
+    var list;
+    var pages = 0;
+    var currentPage = 0;
 
-        this.title = undefined;
-        this.actions = [
-            {
-                id: "search-button",
-                icon: "mdi-action-search",
-                showAsAction: "always"
-            },
-            {
-                id: "show-watchlist-button",
-                title: "@+watchlist+@",
-                showAsAction: "never"
-            },
-            {
-                id: "settings-button",
-                title: "@+settings+@",
-                showAsAction: "never"
+    this.title = undefined;
+    this.actions = [
+      {
+        id: "filter-button",
+        title: "@+filters+@",
+        icon: "mdi-content-filter-list",
+        showAsAction: "always"
+      },
+      {
+        id: "search-button",
+        icon: "mdi-action-search",
+        showAsAction: "always"
+      },
+      {
+        id: "show-watchlist-button",
+        title: "@+watchlist+@",
+        showAsAction: "never"
+      },
+      {
+        id: "settings-button",
+        title: "@+settings+@",
+        showAsAction: "never"
+      }
+    ];
+
+    this.onCreate = function (eActivity, invokeArg) {
+      var exists = false;
+      if (invokeArg != 0 && invokeArg != undefined) {
+        iArg = invokeArg;
+        var genres = localStorage.getItem(paper.lang.getLanguage() + "-genres");
+        if (genres != null) {
+          var genreList = JSON.parse(genres);
+          for (var i = 0; i < genreList.length; i++) {
+            if (genreList[i].id == invokeArg) {
+              exists = true;
+              activity.title = genreList[i].name;
+              break;
             }
-        ];
+          }
+        }
+      }
+      if (!exists) {
+        activity.title = undefined;
+      }
 
-        this.onCreate = function(eActivity, invokeArg){
-            var exists = false;
-            if(invokeArg != 0 && invokeArg != undefined) {
-                iArg = invokeArg;
-                var genres = localStorage.getItem(paper.lang.getLanguage() + "-genres");
-                if(genres != null){
-                    var genreList = JSON.parse(genres);
-                    for(var i = 0; i < genreList.length; i++){
-                        if(genreList[i].id == invokeArg){
-                            exists = true;
-                            activity.title = genreList[i].name;
-                            break;
-                        }
-                    }
-                }
-            }
-            if(!exists){
-                activity.title = undefined;
-            }
-            var params = {api_key: API_KEY, language: paper.lang.getLanguage()};
-            if(typeof(iArg) !== "undefined" && iArg != null){
-                params["with_genres"] = iArg;
-            }
+      list = paper.list.create(eActivity, function (li, item, isHeader) {
+        if (isHeader) {
+          li.addClass("paper-align header sep-top");
+          li.html(item);
+        } else {
+          li.attr("data-key", item.id);
+          li.addClass("paper-align medium wrippels");
+          var imageUrl = API_CONFIG.default_base_url + API_CONFIG.images.logo_sizes[5];
+          var skipImage = false;
+          if (item.poster_path != null) {
+            imageUrl += item.poster_path;
+          } else if (item.backdrop_path != null) {
+            imageUrl += item.backdrop_path;
+          } else {
+            skipImage = true;
+          }
+          if (!skipImage) {
+            var iconHolder = $("<div class='icon fade'></div>").appendTo(li);
+            var image = new Image();
+            image.onload = function () {
+              iconHolder.css("background-image", "url(" + imageUrl + ")");
+              iconHolder.removeClass("fade");
+            };
+            image.src = imageUrl;
+          }
 
-            var getter = this.get(protocol + "api.themoviedb.org/3/discover/movie", params);
-            getter.done(function(json){
+          var year = new Date(item.release_date).getUTCFullYear();
+          var title = $("<div class='title push-trail'></div>").appendTo(li);
+          $("<div class='main'>" + item.title + "</div>").appendTo(title);
 
-                pages = json.total_pages;
-                currentPage = 1;
+          var sub = $("<div class='sub'><b>" + year + "</b></div>").appendTo(title);
+          var ratings = $("<div class='trail'></div>").appendTo(li);
+          var r = item.vote_average / 2;
+          for (var i = 0; i < r; i++) {
+            ratings.append("<i class='fg-yellow mdi-action-star-rate' style='font-size:20px;'></i>");
+          }
+        }
+      });
+      this.refreshList();
+      return false;
+    };
 
-                var movieList = [];
-                for(var i = 0; i < json.results.length; i++){
-                    var r = json.results[i];
-                    var newJSON = {
-                        id: r.id,
-                        backdrop_path: r.backdrop_path,
-                        title: r.title,
-                        vote_average: r.vote_average,
-                        release_date: r.release_date,
-                        poster_path: r.poster_path
-                    };
-                    movieList.push(newJSON);
-                    localStorage.setItem("movie-" + r.id, JSON.stringify(newJSON));
-                }
+    filterRefreshCallback = function () {
+      activity.refreshList();
+    };
 
-                list.render(movieList);
-                activity.loaded();
-            });
-            getter.fail(function(xhr){
-                if(xhr.status === 0 && xhr.statusText !== "abort"){
-                    activity.onError("error-connection", true);
-                }else{
-                    activity.onError("error", true);
-                }
-            });
+    this.refreshList = function() {
+      var params = {api_key: API_KEY, language: paper.lang.getLanguage()};
+      Object.assign(params, filter);
+      if (typeof(iArg) !== "undefined" && iArg != null) {
+        params["with_genres"] = iArg;
+      }
+      if(!params['primary_release_date.lte']){
+        delete params['primary_release_date.lte'];
+      }
+      if(!params['primary_release_date.gte']){
+        delete params['primary_release_date.gte'];
+      }
 
-            list = paper.list.create(eActivity, function(li, item, isHeader){
-                if(isHeader){
-                    li.addClass("paper-align header sep-top");
-                    li.html(item);
-                }else{
-                    li.attr("data-key", item.id);
-                    li.addClass("paper-align medium wrippels");
-                    var imageUrl = API_CONFIG.default_base_url + API_CONFIG.images.logo_sizes[1];
-                    var skipImage = false;
-                    if(item.poster_path != null){
-                        imageUrl += item.poster_path;
-                    }else if(item.backdrop_path != null){
-                        imageUrl += item.backdrop_path;
-                    }else{
-                        skipImage = true;
-                    }
-                    if(!skipImage) {
-                        var iconHolder = $("<div class='icon fade'></div>").appendTo(li);
-                        var image = new Image();
-                        image.onload = function () {
-                            iconHolder.css("background-image", "url(" + imageUrl + ")");
-                            iconHolder.removeClass("fade");
-                        };
-                        image.src = imageUrl;
-                    }
+      var getter = this.get(protocol + "api.themoviedb.org/3/discover/movie", params);
+      getter.done(function (json) {
 
-                    var year = new Date(item.release_date).getUTCFullYear();
-                    var title = $("<div class='title push-trail'></div>").appendTo(li);
-                    $("<div class='main'>" + item.title + "</div>").appendTo(title);
+        pages = json.total_pages;
+        currentPage = 1;
 
-                    var sub = $("<div class='sub'><b>" + year + "</b></div>").appendTo(title);
-                    var ratings = $("<div class='trail'></div>").appendTo(li);
-                    var r = item.vote_average / 2;
-                    for(var i = 0; i < r; i++){
-                        ratings.append("<i class='fg-dark-gray mdi-action-star-rate' style='font-size:20px;'></i>");
-                    }
-                }
-            });
+        var movieList = [];
+        for (var i = 0; i < json.results.length; i++) {
+          var r = json.results[i];
+          var newJSON = {
+            id: r.id,
+            backdrop_path: r.backdrop_path,
+            title: r.title,
+            vote_average: r.vote_average,
+            release_date: r.release_date,
+            poster_path: r.poster_path
+          };
+          movieList.push(newJSON);
+          localStorage.setItem("movie-" + r.id, JSON.stringify(newJSON));
+        }
 
-            return false;
-        };
+        list.render(movieList);
+        activity.loaded();
+      });
+      getter.fail(function (xhr) {
+        if (xhr.status === 0 && xhr.statusText !== "abort") {
+          activity.onError("error-connection", true);
+        } else {
+          activity.onError("error", true);
+        }
+      });
+    };
 
-        $("body").on("navigate", function(event, url, urlData){
-            if(urlData.group === "home"){
-                if(urlData.acts.length == 0){
-                    $("[activity=index-panel] .paper-list li").removeClass("selected");
-                }else{
-                    var arg = urlData.acts[0].arg;
-                    if(typeof(arg) !== "undefined" && arg !== null){
-                        $("[activity=index-panel] .paper-list li").removeClass("selected");
-                        $("[activity=index-panel] .paper-list li[data-key='" + arg + "']").addClass("selected");
-                    }
-                }
-            }
+    $("body").on("navigate", function (event, url, urlData) {
+      if (urlData.group === "home") {
+        if (urlData.acts.length == 0) {
+          $("[activity=index-panel] .paper-list li").removeClass("selected");
+        } else {
+          var arg = urlData.acts[0].arg;
+          if (typeof(arg) !== "undefined" && arg !== null) {
+            $("[activity=index-panel] .paper-list li").removeClass("selected");
+            $("[activity=index-panel] .paper-list li[data-key='" + arg + "']").addClass("selected");
+          }
+        }
+      }
+    });
+
+    $("body").on("click", "[activity=index-panel] .paper-list li:not(.header)", function () {
+      var tthis = this;
+      setTimeout(function () {
+        $(tthis).parent().children().removeClass("selected");
+        $(tthis).addClass("selected");
+        app.goToActivity("film-info", 2, $(tthis).attr("data-key"));
+      }, 300);
+    });
+
+    $("body").on("click", "[activity=index-panel] #show-watchlist-button", function () {
+      app.goToGroup("watchlist");
+    });
+
+    $("body").on("click", "[activity=index-panel] #search-button", function () {
+      app.overlay("search-flow", activity.invokeArg);
+    });
+
+    $("body").on("click", "[activity=index-panel] #filter-button", function () {
+      app.overlay("filter-popup", activity.invokeArg);
+    });
+
+    $("body").on("click", "[activity=index-panel] #settings-button", function () {
+      app.goToGroup("settings");
+    });
+
+    $("body").on("click", "[activity=index-panel] .list-more", function () {
+      var tthis = this;
+      if (!$(this).hasClass("fade")) {
+        $(this).addClass("fade");
+        $(this).next().removeClass("fade");
+        currentPage++;
+        var params = {api_key: API_KEY, language: paper.lang.getLanguage(), page: currentPage};
+        Object.assign(params, filter);
+        if (typeof(iArg) !== "undefined" && iArg != null) {
+          params["with_genres"] = iArg;
+        }
+        if(!params['primary_release_date.lte']){
+          delete params['primary_release_date.lte'];
+        }
+        if(!params['primary_release_date.gte']){
+          delete params['primary_release_date.gte'];
+        }
+        var getter = activity.get(protocol + "api.themoviedb.org/3/discover/movie", params);
+        getter.done(function (json) {
+          var movieList = {};
+          for (var i = 0; i < json.results.length; i++) {
+            var r = json.results[i];
+            movieList[r.id] = r;
+            localStorage.setItem("movie-" + r.id, JSON.stringify(r));
+          }
+
+          list.append(json.results, 0);
+          $(tthis).removeClass("fade");
+          $(tthis).next().addClass("fade");
         });
-
-        $("body").on("click", "[activity=index-panel] .paper-list li:not(.header)", function(){
-            var tthis = this;
-            setTimeout(function(){
-                $(tthis).parent().children().removeClass("selected");
-                $(tthis).addClass("selected");
-                app.goToActivity("film-info", 2, $(tthis).attr("data-key"));
-            }, 300);
-        });
-
-        $("body").on("click", "[activity=index-panel] #show-watchlist-button", function(){
-            app.goToGroup("watchlist");
-        });
-
-        $("body").on("click", "[activity=index-panel] #search-button", function(){
-            app.overlay("search-flow", activity.invokeArg);
-        });
-
-        $("body").on("click", "[activity=index-panel] #settings-button", function(){
-            app.goToGroup("settings");
-        });
-
-        $("body").on("click", "[activity=index-panel] .list-more", function(){
-            var tthis = this;
-            if(!$(this).hasClass("fade")){
-                $(this).addClass("fade");
-                $(this).next().removeClass("fade");
-                currentPage++;
-                var params = {api_key: API_KEY, language: paper.lang.getLanguage(), page: currentPage};
-                if(typeof(iArg) !== "undefined" && iArg != null){
-                    params["with_genres"] = iArg;
-                }
-                var getter = activity.get(protocol + "api.themoviedb.org/3/discover/movie", params);
-                getter.done(function(json){
-                    var movieList = {};
-                    for(var i = 0; i < json.results.length; i++){
-                        var r = json.results[i];
-                        movieList[r.id] = r;
-                        localStorage.setItem("movie-" + r.id, JSON.stringify(r));
-                    }
-
-                    list.append(json.results, 0);
-                    $(tthis).removeClass("fade");
-                    $(tthis).next().addClass("fade");
-                });
-            }
-
-        });
+      }
 
     });
+
+  });
 </script>

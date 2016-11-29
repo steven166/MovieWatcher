@@ -1,15 +1,15 @@
 <template activity="film-info">
     <style>
-        [activity=film-info][pos="oxo"] .film-info-cover{
+        [activity=film-info][pos="oxo"] .film-info-cover, [activity=film-info][pos="oox"] .film-info-cover{
             position: relative;
             height: 75vh;
         }
 
-        [activity=film-info][pos="oxo"] .film-info-cover.notrailer{
+        [activity=film-info][pos="oxo"] .film-info-cover.notrailer,[activity=film-info][pos="oox"] .film-info-cover.notrailer{
             height: 70vh;
         }
 
-        [activity=film-info][pos="oxo"] .film-info-poster{
+        [activity=film-info][pos="oxo"] .film-info-poster, [activity=film-info][pos="oox"] .film-info-poster{
             position: absolute;
             width: 75%;
             left: 12.5%;
@@ -21,11 +21,11 @@
             background-position: center;
         }
 
-        [activity=film-info][pos="oxo"] .film-info-cover.notrailer .film-info-poster{
+        [activity=film-info][pos="oxo"] .film-info-cover.notrailer .film-info-poster, [activity=film-info][pos="oox"] .film-info-cover.notrailer .film-info-poster{
             bottom: 55px;
         }
 
-        [activity=film-info][pos="oxo"] .film-info-trailer{
+        [activity=film-info][pos="oxo"] .film-info-trailer, [activity=film-info][pos="oox"] .film-info-trailer{
             position: absolute;
             bottom: 45px;
             left: 12.5%;
@@ -33,7 +33,7 @@
             margin-left: 0;
         }
 
-        [activity=film-info][pos="oxo"] .film-info-download{
+        [activity=film-info][pos="oxo"] .film-info-download, [activity=film-info][pos="oox"] .film-info-download{
             position: absolute;
             bottom: 0px;
             left: 12.5%;
@@ -217,7 +217,7 @@
 
             var done = 0;
 
-            var getter = this.get(protocol + "api.themoviedb.org/3/movie/" + invokeArg, {api_key: API_KEY, append_to_response: "videos", language: paper.lang.getLanguage()});
+            var getter = this.get(protocol + "api.themoviedb.org/3/movie/" + invokeArg, {api_key: API_KEY, append_to_response: "videos"});
             getter.done(function(json){
                 done++;
 

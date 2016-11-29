@@ -5,7 +5,7 @@ error_reporting(LOG_ERR);
 
 $imdb = $_GET["imdb"];
 if(!empty($imdb)){
-    $html = file_get_contents("https://thepiratebay.am/search/" . $imdb);
+    $html = file_get_contents("https://thepiratebay.org/search/" . $imdb);
     if($html){
         $result = array();
 
@@ -68,7 +68,7 @@ if(!empty($imdb)){
 
         echo json_encode($result);
     }else{
-        http_response_code(400);
+        http_response_code(503);
     }
 }else{
     http_response_code(400);

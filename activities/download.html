@@ -39,9 +39,10 @@
                     if(isHeader){
                         li.addClass("header").html(item);
                     }else{
-                        li.addClass("medium").addClass("wrippels");
-                        $("<div class='title main'></div>").html(item.title).appendTo(li);
-                        var subTitle = $("<div class='title sub'><div><span class='fg-green'>" + item.seeders + "</span> | <span class='fg-blue'>" + item.leechers + " </span></div></div>").appendTo(li);
+                        li.addClass("paper-align medium").addClass("wrippels");
+                        var title = $("<div class='title'></div>").appendTo(li);
+                        $("<div class='main'></div>").html(item.title).appendTo(title);
+                        var subTitle = $("<div class='sub'><div><span class='fg-green'>" + item.seeders + "</span> | <span class='fg-blue'>" + item.leechers + " </span></div></div>").appendTo(title);
                         $("<b>" + item.size + "</b>").appendTo(subTitle);
                         if(item.res != null) {
                             var color = "";

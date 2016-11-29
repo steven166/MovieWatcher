@@ -1,9 +1,20 @@
 
-var downloadEnabled = false;
+var downloadEnabled = true;
 
 var API_KEY = "76a4eeaa0b33a5169893adf856328a34";
 
 var keyName = "session.key";
+
+var filter = {
+    include_adult: true,
+    sort_by: 'popularity.desc',
+    'primary_release_date.gte': '',
+    'primary_release_date.lte': ''
+};
+if(localStorage.getItem('discover.filter')){
+    filter = JSON.parse(localStorage.getItem('discover.filter'));
+}
+var filterRefreshCallback = function(){};
 
 var protocol = "https://";
 if(location.protocol === "http:"){

@@ -1,7 +1,7 @@
 app.group("home", function(){
     this.leftAction = "menu";
     this.activity_1 = "index-panel";
-    this.activity_2_type = "medium";
+    this.activity_1_type = "large";
     this.drawer = "index-drawer";
 });
 
