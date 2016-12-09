@@ -1,0 +1,12 @@
+*
+!moviewatcher-server/src
+!moviewatcher-server/package.json
+!moviewatcher-server/bin
+!moviewatcher-server/routes
+!moviewatcher-server/repositories
+!moviewatcher-server/domain
+!moviewatcher-server/app.js
+!moviewatcher-server/config.js
+!moviewatcher-server/config.json
+
+!moviewatcher-ui

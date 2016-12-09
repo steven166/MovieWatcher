@@ -4295,7 +4295,7 @@ var paper = {
                 }
             }else{
                 e.find(".paper-progress").each(function(){
-                    paper.progress.update($(this));
+                    paper.progress.update($(this), value);
                 });
             }
         }

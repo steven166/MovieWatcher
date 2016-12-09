@@ -39,6 +39,8 @@ var lang_en = {
     "filter-start-date": "Start release date",
     "filter-end-date": "End release date",
 
+     "downloads": "Downloads",
+
     "rating": "Rating:",
     "genre": "Genre:",
     "release-date": "Release date:",

@@ -1,0 +1,119 @@
+<template activity="download-list">
+  <style>
+
+    [activity=download-list] .paper-list .trail {
+      width: auto;
+    }
+
+    [activity=download-list] .paper-list .title .sub b {
+      position: relative;
+      font-weight: bold;
+      font-size: 14px;
+    }
+
+    [activity=download-list] .paper-list .title .sub .bar {
+      left: 0;
+    }
+
+  </style>
+  <ul class="paper-list"></ul>
+</template>
+<script>
+  app.activity("download-list", function () {
+
+    var activity = this;
+    this.title = "@+downloads+@";
+
+    this.onCreate = function (eActivity, invokeArg) {
+      var listElement = eActivity.find('.paper-list');
+      lastDownlaods.forEach(function (item) {
+        processItem(item, listElement);
+      });
+      callbacks.downloadsUpdated = function (downloads) {
+        downloads.forEach(function (item) {
+          processItem(item, listElement);
+        });
+        removeItems(downloads, listElement);
+      };
+    };
+
+    function removeItems(items, list){
+      var removeElements = [];
+      list.each(function(){
+        var imdb = $(this).attr('imdb');
+        if(imdb){
+          if(items.filter(item => item.imdb === imdb).length == 0){
+            removeElements.push($(this));
+          }
+        }else{
+          removeElements.push($(this));
+        }
+      });
+    }
+
+    function processItem(item, list) {
+      var itemElement = list.find("[imdb='" + item.imdb + "']");
+      if (itemElement.length == 0) {
+        itemElement = $("<li class='paper-align medium'></li>").attr('imdb', item.imdb);
+        $("<div class='icon'><i class='mdi-file-file-download'></i></div>").appendTo(itemElement);
+        var titleElement = $("<div class='title'><div class='main'>" + item.title + "</div></div>").appendTo(itemElement);
+        var progressBar = $("<div class='sub paper-progress orange'></div>").appendTo(titleElement);
+        paper.progress.init(progressBar);
+
+        var trail = $("<div class='trail'></div>").appendTo(itemElement);
+
+        itemElement.appendTo(list);
+      }
+
+      var progressBar = itemElement.find('.paper-progress').removeClass("orange").removeClass('gray').removeClass('gray').removeClass('green');
+      var icon = itemElement.find('.icon').removeClass("orange").removeClass('gray').removeClass('gray').removeClass('green');
+      var i = icon.find('i');
+      var color = 'orange';
+      if (item.state === 'DOWNLOADING') {
+        progressBar.removeAttr('type');
+        paper.progress.update(itemElement, item.progress);
+        i.attr('class', 'mdi-file-file-download');
+      } else if (item.state === 'PAUSED') {
+        progressBar.removeAttr('type');
+        paper.progress.update(itemElement, item.progress);
+        color = "gray";
+        i.attr('class', 'mdi-av-pause');
+      } else if (item.state === 'ERROR') {
+        progressBar.removeAttr('type');
+        paper.progress.update(itemElement, 0);
+        color = "red";
+        i.attr('class', 'mdi-navigation-close');
+      } else if (item.state === 'COMPLETE') {
+        progressBar.removeAttr('type', 'indeterminate');
+        paper.progress.update(itemElement, 100);
+        color = "green";
+        i.attr('class', 'mdi-action-done');
+      } else {
+        progressBar.attr('type', 'indeterminate');
+        paper.progress.update(itemElement, item.progress);
+        i.attr('class', 'mdi-file-file-download');
+      }
+      progressBar.addClass(color);
+      icon.addClass(color);
+
+      if(item.eta > 0){
+        itemElement.find('.trail').text(parseSeconds(item.eta));
+      }else{
+        itemElement.find('.trail').text('Pending');
+      }
+    }
+
+    function parseSeconds(seconds){
+      if(seconds > 86400){
+        return parseInt(seconds / 86400) + 'd';
+      }else if(seconds > 3600 ){
+        return parseInt(seconds / 3600) + 'h';
+      }else if(seconds > 60){
+        return parseInt(seconds / 60) + 'm';
+      }else{
+        return seconds + 's';
+      }
+    }
+
+  });
+</script>

@@ -39,6 +39,7 @@ var lang_nl = {
     "filter-start-date": "Start release datum",
     "filter-end-date": "Eind release datum",
 
+    "downloads": "Downloads",
 
     "rating": "Beoordeling:",
     "genre": "Genre:",

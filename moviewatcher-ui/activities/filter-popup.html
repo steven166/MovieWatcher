@@ -124,7 +124,7 @@
 
     function saveFilters(){
       localStorage.setItem('discover.filter', JSON.stringify(filter));
-      filterRefreshCallback();
+      callbacks.filterRefresh();
     }
   });
 </script>

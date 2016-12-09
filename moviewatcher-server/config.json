@@ -1,0 +1,14 @@
+{
+  "utserver": {
+    "host": "localhost",
+    "port": "36880",
+    "username": "admin",
+    "password": ""
+  },
+  "tpb": {
+    "url": "https://thepiratebay.org"
+  },
+  "storage": "data"
+
+
+}

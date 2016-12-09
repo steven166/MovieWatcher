@@ -1,0 +1,25 @@
+version: '2'
+services:
+  moviewatcher:
+    image: moviewatcher:dev
+    build:
+      context: .
+      dockerfile: Dockerfile-dev
+      args:
+        PROXY_URL: http://192.168.0.24:4873
+    volumes:
+     - .:/moviewatcher
+    ports:
+     - "3000:3000"
+    links:
+     - utserver
+  utserver:
+    image: softvisio/utserver:latest
+    volumes:
+     - /c/docker/utserver/autoload/:/var/local/utserver/autoload/
+     - /c/docker/utserver/data/:/var/local/utserver/data/
+     - /c/docker/utserver/settings:/var/local/utserver/settings/
+    ports:
+     - "36880:8080"
+     - "36881:6881"
+     - "36881:6881/udp"
