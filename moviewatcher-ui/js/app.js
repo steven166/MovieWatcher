@@ -5,8 +5,9 @@ var keyName = "session.key";
 
 var callbacks = {
     filterRefresh: function(){},
-    downloadsUpdated: function(downloads){}
+    downloadsUpdated: function(downloads){},
 };
+var serieMode = false;
 var filter = {
     include_adult: true,
     sort_by: 'popularity.desc',
@@ -15,6 +16,9 @@ var filter = {
 };
 if(localStorage.getItem('discover.filter')){
     filter = JSON.parse(localStorage.getItem('discover.filter'));
+}
+if(localStorage.getItem('discover.serieMode')){
+  serieMode = JSON.parse(localStorage.getItem('discover.serieMode'));
 }
 var lastDownlaods = [];
 
@@ -58,7 +62,7 @@ paper.app.errorHandlers["401"] = function(jqXHR, textStatus, errorThrown){
 
 // downloads polling
 setInterval(function(){
-    paper.app.get('/downloads')
+    $.get('/downloads')
         .done(function(json){
             lastDownloads = json;
             callbacks.downloadsUpdated(json);

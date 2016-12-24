@@ -1,0 +1,4 @@
+/moviewatcher-server/node_modules
+/moviewatcher-server/data
+/moviewatcher-server/*.iml
+/.idea

@@ -181,7 +181,7 @@
         }
       }
       if (!exists) {
-        activity.title = undefined;
+        activity.title = paper.lang.get('app-name');
       }
 
       list = paper.list.create(eActivity, function (li, item, isHeader) {
@@ -225,7 +225,7 @@
       this.refreshList();
 
       eActivity.scroll(function (e) {
-        if (($(this).children().height() - $(this).height() - this.scrollTop) < 100) {
+        if (($(this).children().height() - $(this).height() - this.scrollTop) < 600) {
           activity.loadNewPage();
         }
       });
@@ -252,7 +252,7 @@
           delete params['primary_release_date.gte'];
         }
 
-        var getter = this.get(protocol + "api.themoviedb.org/3/discover/movie", params);
+        var getter = this.get(protocol + "api.themoviedb.org/3/discover/" + (serieMode ? 'tv' : 'movie'), params);
         getter.done(function (json) {
 
           pages = json.total_pages;
@@ -264,13 +264,12 @@
             var newJSON = {
               id: r.id,
               backdrop_path: r.backdrop_path,
-              title: r.title,
+              title: r.title || r.name,
               vote_average: r.vote_average,
-              release_date: r.release_date,
+              release_date: r.release_date || r.first_air_date,
               poster_path: r.poster_path
             };
             movieList.push(newJSON);
-            localStorage.setItem("movie-" + r.id, JSON.stringify(newJSON));
           }
 
           list.render(movieList);
@@ -354,16 +353,23 @@
           if (!params['primary_release_date.gte']) {
             delete params['primary_release_date.gte'];
           }
-          var getter = activity.get(protocol + "api.themoviedb.org/3/discover/movie", params);
+          var getter = activity.get(protocol + "api.themoviedb.org/3/discover/" + (serieMode ? 'tv' : 'movie'), params);
           getter.done(function (json) {
-            var movieList = {};
-            for (var i = 0; i < json.results.length; i++) {
+            let movieList = [];
+            for (let i = 0; i < json.results.length; i++) {
               var r = json.results[i];
-              movieList[r.id] = r;
-              localStorage.setItem("movie-" + r.id, JSON.stringify(r));
+              var newJSON = {
+                id: r.id,
+                backdrop_path: r.backdrop_path,
+                title: r.title || r.name,
+                vote_average: r.vote_average,
+                release_date: r.release_date || r.first_air_date,
+                poster_path: r.poster_path
+              };
+              movieList.push(newJSON);
             }
 
-            list.append(json.results, 0);
+            list.append(movieList, 0);
             $(button).removeClass("fade");
             $(button).next().addClass("fade");
             reloading = false;

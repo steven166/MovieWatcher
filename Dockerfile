@@ -5,11 +5,11 @@ RUN npm set registry ${PROXY_URL:-https://registry.npmjs.org/}
 
 WORKDIR /moviewatcher/moviewatcher-server
 ADD ./moviewatcher-server/package.json .
-RUN npm install --production
+RUN npm install --production && rm package.json
 
 ADD moviewatcher-server /moviewatcher/moviewatcher-server
 ADD moviewatcher-ui /moviewatcher/moviewatcher-ui
+RUN mkdir /moviewatcher/moviewatcher-server/data
 
-WORKDIR /moviewatcher/moviewatcher-server
 EXPOSE 3000
 CMD ["npm", "start"]

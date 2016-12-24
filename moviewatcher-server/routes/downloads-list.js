@@ -3,13 +3,14 @@ var config = require("../config");
 var path = require("path");
 var downloadStates = require('../domain/download-states');
 var error = require('./route.helper').error;
+var softError = require('./route.helper').softError;
 
 var router = express.Router();
 
 router.get('/downloads', (req, res, next) => {
   config.getDownloadClient().call('list', (err, body) => {
     if(err) {
-      error(res, err);
+      softError(res, err);
       return;
     }
 
@@ -37,7 +38,7 @@ router.get('/downloads', (req, res, next) => {
     let promises = downloads.map(download => config.getDownloadRepository().find(download.hash));
     Promise.all(promises).then(items => {
       // merge imdb and title
-      items.forEach(item => {
+      items.filter(item => item).forEach(item => {
         downloads.filter(download => download.hash.toLowerCase() === item.hash.toLowerCase()).forEach(download => {
           download.imdb = item.imdb;
           download.title = item.title;
@@ -60,7 +61,7 @@ router.get('/downloads', (req, res, next) => {
       });
 
       // remove completed
-      downloads.filter(download => download.state === 'COMPLETE').forEach(removeCompleteDownloads);
+      downloads.filter(download => download.state === 'COMPLETE').forEach(download => removeCompleteDownloads(download));
 
       res.json(downloads);
     }).catch(err => error(res, err));

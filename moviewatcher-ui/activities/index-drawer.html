@@ -1,74 +1,106 @@
 <template activity="index-drawer">
+  <style>
+    .drawer-head {
+      background-image: url(images/wallpaper.jpg);
+      transition: 0.2s ease all;
+    }
+    .drawer-head.serie{
+      background-image: url(images/wallpaper-serie.jpg);
+      box-shadow: inset 10px 10px 151px 0px rgba(0,0,0,0.75);
+    }
 
+    .paper-align.header .trail {
+      padding: 0;
+      right: 16px;
+      top: 0px;
+    }
+  </style>
+  <div class='drawer-head'></div>
+  <div class='drawer-container'>
+    <div class="paper-align header">
+      <div class="text" lang-key="series"></div>
+      <div class="trail">
+        <input type="checkbox" class="paper-switch orange">
+      </div>
+    </div>
+    <ul class="paper-list"></ul>
+  </div>
 </template>
 <script>
-    app.activity("index-drawer", function () {
+  app.activity("index-drawer", function () {
 
-        var activity = this;
+    var activity = this;
+    var list;
 
-        this.onCreate = function (eActivity, invokeArg) {
-            var listHead = $("<div class='drawer-head'></div>").appendTo(eActivity);
-            listHead.css("background-image", "url(images/wallpaper.jpg)");
-            var listContainer = $("<div class='drawer-container'></div>").appendTo(eActivity);
+    this.onCreate = function (eActivity, invokeArg) {
+      var listContainer = eActivity.find('.paper-list');
+      list = paper.list.create(listContainer, function (li, item, isHeader) {
+        li.addClass("paper-align small wrippels");
+        li.text(item.name);
+        li.attr("data-key", item.id);
+        if (item.id == invokeArg || item.id == 0 && invokeArg == undefined) {
+          li.addClass("selected");
+        }
+      });
+      eActivity.find('.paper-switch').prop('checked', serieMode);
+      if(serieMode) {
+        eActivity.find('.drawer-head').addClass('serie');
+      }else{
+        eActivity.find('.drawer-head').removeClass('serie');
+      }
+      this.loadGenres();
+      return false;
+    };
 
-            var list = paper.list.create(listContainer, function (li, item, isHeader) {
-                if (isHeader) {
-                    li.addClass("paper-align header");
-                    li.html(item);
-                } else {
-                    li.addClass("paper-align small wrippels");
-                    li.text(item.name);
-                    li.attr("data-key", item.id);
-                    if (item.id == invokeArg || item.id == 0 && invokeArg == undefined) {
-                        li.addClass("selected");
-                    }
-                }
-            });
+    this.loadGenres = function() {
+      var genreKey = paper.lang.getLanguage() + "-genres";
+      console.debug("load genres: " + genreKey);
+      var params = {api_key: API_KEY, language: paper.lang.getLanguage()};
+      var getter = this.get(protocol + "api.themoviedb.org/3/genre/" + (serieMode ? 'tv' : 'movie') + "/list", params);
+      getter.done(function (json) {
+        var genreList = [{id: 0, name: paper.lang.get("all")}];
+        for (var i = 0; i < json.genres.length; i++) {
+          genreList.push(json.genres[i]);
+        }
+        var genreKey = paper.lang.getLanguage() + "-genres";
+        console.debug("save genres: " + genreKey);
+        localStorage.setItem(genreKey, JSON.stringify(genreList));
+        list.render(genreList, 40);
+        activity.loaded();
+      });
+      getter.fail(function (xhr) {
+        if (xhr.status === 0 && xhr.statusText !== "abort") {
+          activity.onError("error-connection", true);
+        } else {
+          activity.onError("error", true);
+        }
+      });
+    };
 
-            var genreKey = paper.lang.getLanguage() + "-genres";
-            console.debug("load genres: " + genreKey);
-            var genres = localStorage.getItem(genreKey);
-            if (genres == null) {
-                var params = {api_key: API_KEY, language: paper.lang.getLanguage()};
-                var getter = this.get(protocol + "api.themoviedb.org/3/genre/movie/list", params);
-                getter.done(function (json) {
-                    var genreList = [{id: 0, name: paper.lang.get("all")}];
-                    for (var i = 0; i < json.genres.length; i++) {
-                        genreList.push(json.genres[i]);
-                    }
-                    var genreKey = paper.lang.getLanguage() + "-genres";
-                    console.debug("save genres: " + genreKey);
-                    localStorage.setItem(genreKey, JSON.stringify(genreList));
-                    var renderData = {};
-                    renderData[paper.lang.get("genres")] = genreList;
-                    list.render(renderData, 40);
-                    activity.loaded();
-                });
-                getter.fail(function (xhr) {
-                    if (xhr.status === 0 && xhr.statusText !== "abort") {
-                        activity.onError("error-connection", true);
-                    } else {
-                        activity.onError("error", true);
-                    }
-                });
-                return false;
-            } else {
-                var renderData = {};
-                renderData[paper.lang.get("genres")] = JSON.parse(genres);
-                list.render(renderData, 40);
-            }
-
-
-        };
-
-        $("body").on("click", "[activity=index-drawer] .paper-list li", function () {
-            var tthis = this;
-            setTimeout(function () {
-                $(tthis).parent().children().removeClass("selected");
-                $(tthis).addClass("selected");
-                app.goToGroup(app.getUrlData().group, $(tthis).attr("data-key"));
-            }, 300);
-        });
-
+    $("body").on("click", "[activity=index-drawer] .paper-list li:not(.header)", function () {
+      var tthis = this;
+      setTimeout(function () {
+        $(tthis).parent().children().removeClass("selected");
+        $(tthis).addClass("selected");
+        app.goToGroup(app.getUrlData().group, $(tthis).attr("data-key"));
+      }, 300);
     });
+
+    $("body").on("click", "[activity=index-drawer] .paper-switch-container", function () {
+      serieMode = $(this).find("input[type=checkbox]").prop("checked");
+      localStorage.setItem('discover.serieMode', serieMode);
+      activity.loadGenres();
+      if(callbacks.filterRefresh){
+        callbacks.filterRefresh();
+      }
+      setTimeout(function(){
+        if(serieMode){
+          activity.element.find('.drawer-head').addClass('serie');
+        }else{
+          activity.element.find('.drawer-head').removeClass('serie');
+        }
+      }, 200);
+    });
+
+  });
 </script>

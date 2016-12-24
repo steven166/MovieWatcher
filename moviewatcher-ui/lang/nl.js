@@ -43,6 +43,7 @@ var lang_nl = {
 
     "rating": "Beoordeling:",
     "genre": "Genre:",
+    "series": "Series",
     "release-date": "Release datum:",
     "runtime": "Duur:",
     "spoken-lang": "Gesproken taal:",

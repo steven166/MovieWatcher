@@ -21,18 +21,25 @@ class DownloadRepository {
   find(hash) {
     let file = this.getFileFor(hash);
     return new Promise(function (resolve, reject) {
-      fs.readFile(file, (err, data) => {
-        if (err) {
-          reject(err);
-        } else {
-          try {
-            let object = JSON.parse(data);
-            resolve(object);
-          }catch(e){
-            reject(e);
-          }
+      fs.exists(file, (exists) => {
+        if(exists){
+          fs.readFile(file, (err, data) => {
+            if (err) {
+              reject(err);
+            } else {
+              try {
+                let object = JSON.parse(data);
+                resolve(object);
+              }catch(e){
+                reject(e);
+              }
+            }
+          });
+        }else{
+          resolve(null);
         }
       });
+
     });
   }
 
@@ -47,7 +54,7 @@ class DownloadRepository {
   }
 
   getFileFor(hash) {
-    return path.join(__dirname, '..', config.get('storage', 'data'), hash + '.json');
+    return path.join(__dirname, '..', config.get('storage', 'data'), hash.toLowerCase() + '.json');
   }
 
 }

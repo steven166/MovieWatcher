@@ -43,6 +43,7 @@ var lang_en = {
 
     "rating": "Rating:",
     "genre": "Genre:",
+    "series": "Series",
     "release-date": "Release date:",
     "runtime": "Runtime:",
     "spoken-lang": "Spoken language:",

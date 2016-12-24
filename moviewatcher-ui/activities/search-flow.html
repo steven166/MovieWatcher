@@ -82,9 +82,9 @@
                         image.src = imageUrl;
                     }
 
-                    var year = new Date(item.release_date).getUTCFullYear();
+                    var year = new Date(item.release_date || item.first_air_date).getUTCFullYear();
                     var title = $("<div class='title push-trail'></div>").appendTo(li);
-                    $("<div class='main'>" + item.title + "</div>").appendTo(title);
+                    $("<div class='main'>" + (item.title || item.name) + "</div>").appendTo(title);
 
                     var sub = $("<div class='sub'><b>" + year + "</b></div>").appendTo(title);
                     var ratings = $("<div class='trail'></div>").appendTo(li);
@@ -124,7 +124,7 @@
                         api_key: API_KEY,
                         query: input
                     };
-                    var getter = activity.get(protocol + "api.themoviedb.org/3/search/movie", params);
+                    var getter = activity.get(protocol + "api.themoviedb.org/3/search/" + (serieMode ? 'tv' : "movie"), params);
                     getter.done(function(json){
                         for(var i = 0; i < json.results.length; i++){
                             localStorage.setItem("movie-" + json.results[i].id, JSON.stringify(json.results[i]));
