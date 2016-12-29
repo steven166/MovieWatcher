@@ -34,15 +34,21 @@
     this.onCreate = function (eActivity, invokeArg) {
 
       var id = app.getUrlData().acts[0].arg;
-      var imdb = invokeArg;
-      var movieJSON = localStorage.getItem("movie-" + id);
-      if(movieJSON == null){
-        eActivity.html("Not found");
-        return;
-      }
-      var movieMeta = JSON.parse(movieJSON);
+      var json = decodeURIComponent(invokeArg);
+      var movieMeta = JSON.parse(json);
 
-      var getter = this.get("/downloads/search", {imdb: invokeArg});
+      let query = movieMeta.title;
+      if(movieMeta.season){
+        query += ' s' + movieMeta.season;
+      }
+      if(movieMeta.episode){
+        query += ' e' + movieMeta.episode;
+      }
+      if(movieMeta.imdb){
+        query += '|' + movieMeta.imdb;
+      }
+
+      var getter = this.get("/downloads/search", {imdb: query});
 
       getter.done(function (json) {
         var list = paper.list.create(eActivity, function (li, item, isHeader) {
@@ -68,7 +74,7 @@
               $("<b class='" + color + "'>" + item.res + "</b>").appendTo(subTitle);
             }
             li.click(function () {
-              activity.post('/downloads', {link: item.link, imdb: imdb, title: movieMeta.title}).done(function(){
+              activity.post('/downloads', {link: item.link, imdb: query, title: movieMeta.title}).done(function(){
                 paper.toast("Downloading " + movieMeta.title);
               });
             });

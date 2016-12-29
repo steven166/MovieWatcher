@@ -116,11 +116,51 @@
       font-size: 40px !important;
       text-shadow: rgba(0, 0, 0, 0.43) 1px 1px;
     }
+
+    [activity=film-info] .film-info-download.serie{
+      bottom: 0px;
+      left: 47.5%;
+      width: 40%;
+    }
+
+    [activity=film-info] .film-info-cover.serie .film-info-download span{
+      display:none;
+    }
+
+    [activity=film-info] .serie-download{
+      display:none;
+    }
+
+    [activity=film-info] .film-info-cover.serie .serie-download{
+      display:inline-block;
+      position: absolute;
+      bottom: -5px;
+      left: 12.5%;
+      height: 50px;
+      width: 75%;
+      margin-left: 0;
+    }
+    [activity=film-info] .film-info-cover.serie .serie-download select{
+      height: 30px;
+      margin: 5px;
+    }
+
+    [activity=film-info] .film-info-cover.serie .film-info-download{
+      width: 30%;
+      left: 57.5%;
+    }
+
   </style>
   <div class="film-info-cover">
     <div class="film-info-poster shadow-3"></div>
     <div class="film-info-trailer blue-gray paper-button wrippels"><i class="mdi-av-videocam"></i>
       <span lang-key="watch-trailer"></span></div>
+    <div class="serie-download">
+      <span>S</span>
+      <select class="season"></select>
+      <span>E</span>
+      <select class="episode"></select>
+    </div>
     <div class="film-info-download blue-gray paper-button wrippels"><i class="mdi-file-file-download"></i>
       <span lang-key="download"></span></div>
   </div>
@@ -166,7 +206,7 @@
 
     var activity = this;
     var videoSource = undefined;
-    var imdb = undefined;
+    var item = undefined;
     this.title = "Movie";
 
     this.actions = [
@@ -210,6 +250,38 @@
       });
       getter.done(function (json) {
         done++;
+
+        item = json;
+        if(!item.imdb_id){
+          eActivity.find('.film-info-cover').addClass('serie');
+          let seasonsSelect = eActivity.find('.film-info-cover .season');
+          let episodeSelect = eActivity.find('.film-info-cover .episode');
+          if(item.number_of_seasons){
+            seasonsSelect.append($('<option>all</option>'));
+            for(let i = 1; i <= item.number_of_seasons; i++){
+              seasonsSelect.append($('<option value="' + i + '">' + i + '</option>'));
+            }
+          }
+          if(item.number_of_episodes){
+            episodeSelect.append($('<option>all</option>'));
+            for(let i = 1; i <= item.number_of_episodes; i++){
+              episodeSelect.append($('<option value="' + i + '">' + i + '</option>'));
+            }
+          }
+          seasonsSelect.on('change', function(){
+            if(item.seasons){
+              let season = item.seasons.filter(season => season.season_number == $(this).val())[0];
+              if(season){
+                episodeSelect.html('');
+                episodeSelect.append($('<option>all</option>'));
+                for(let i = 1; i <= season.episode_count; i++){
+                  episodeSelect.append($('<option value="' + i + '">' + i + '</option>'));
+                }
+              }
+            }
+          });
+
+        }
 
         activity.title = json.title || json.name;
         var imageUrl = API_CONFIG.default_base_url + API_CONFIG.images.logo_sizes[1];
@@ -257,8 +329,6 @@
         for (var i = 0; i < r; i++) {
           eRatings.append("<i class='fg-yellow mdi-action-star-rate'></i>");
         }
-
-        imdb = json.imdb_id;
 
         var eGenres = eActivity.find(".film-info-genre");
         var genres = "";
@@ -346,7 +416,22 @@
 
     $("body").on("click", "[activity=film-info] .film-info-download", function () {
       setTimeout(function () {
-        app.goToActivity("download", 3, imdb);
+        let movieMeta = {
+          title: item.title || item.name
+        };
+        if(item.imdb_id){
+          movieMeta.imdb = item.imdb_id;
+        }else{
+          let season = activity.element.find('.serie-download .season').val();
+          let episode = activity.element.find('.serie-download .episode').val();
+          if(season && season !== 'all'){
+            movieMeta.season = season;
+          }
+          if(episode && episode !== 'all'){
+            movieMeta.episode = episode;
+          }
+        }
+        app.goToActivity("download", 3, encodeURIComponent(JSON.stringify(movieMeta)));
       }, 300);
     });
 
