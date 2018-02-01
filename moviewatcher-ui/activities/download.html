@@ -37,18 +37,18 @@
       var json = decodeURIComponent(invokeArg);
       var movieMeta = JSON.parse(json);
 
-      let query = movieMeta.title;
-      if(movieMeta.season){
-        query += ' season ' + movieMeta.season;
-      }
-      if(movieMeta.episode){
-        query += ' episode ' + movieMeta.episode;
-      }
-      if(movieMeta.imdb){
-        query += '|' + movieMeta.imdb;
-      }
+//      let query = movieMeta.title;
+//      if(movieMeta.season){
+//        query += ' season ' + movieMeta.season;
+//      }
+//      if(movieMeta.episode){
+//        query += ' episode ' + movieMeta.episode;
+//      }
+//      if(movieMeta.imdb){
+//        query += '|' + movieMeta.imdb;
+//      }
 
-      var getter = this.get("/downloads/search", {imdb: query});
+      var getter = this.get("/downloads/search", {imdb: movieMeta.imdb});
 
       getter.done(function (json) {
         var list = paper.list.create(eActivity, function (li, item, isHeader) {

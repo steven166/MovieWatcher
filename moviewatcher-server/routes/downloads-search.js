@@ -4,6 +4,8 @@ var request = require("request");
 var express = require("express");
 var validate = require('./route.helper').validate;
 var error = require('./route.helper').error;
+var rarbgApi = require('rarbg-api')
+
 
 var router = express.Router();
 
@@ -12,23 +14,28 @@ router.get('/downloads/search', (req, res, next) => {
     return;
   }
 
-  var url = config.get('tpb.url') + '/search/' + req.query['imdb'];
+  let type;
+  let value;
+  if (req.query['imdb']) {
+    type = "imdb";
+    value = req.query['imdb'];
+  } else if (req.query['tvdb']) {
+    type = "tvdb";
+    value = req.query['tvdb'];
+  } else {
+    res.status = 400;
+    res.send("bad request");
+    return;
+  }
 
-  request(url, (err, response, body) => {
-    if (err) {
-      error(res, err);
-      return;
-    }
-
-    let root = HTMLParser.parse(body);
-    let items = root.querySelectorAll('#searchResult tr');
-    let result = items.filter(item => item.classNames.indexOf("header") == -1).map(item => {
+  rarbgApi.search(value, null, type).then(data => {
+    let result = data.map(item => {
       let resultItem = {
-        title: item.querySelector(".detName a").text,
-        leechers: item.querySelectorAll("td")[3].text,
-        seeders: item.querySelectorAll("td")[2].text,
-        link: item.querySelectorAll("td")[1].querySelectorAll("a")[1].attributes['href'],
-        size: /^.*Size (.+),.*$/.exec(item.querySelector('font').text)[1],
+        title: item.title,
+        leechers: item.leechers,
+        seeders: item.seeders,
+        link: item.download,
+        size: bytesToSize(item.size),
         resultItem: null
       };
 
@@ -50,9 +57,23 @@ router.get('/downloads/search', (req, res, next) => {
       }
       return resultItem;
     });
-
     res.json(result);
+  }).catch(e => {
+    if (e.error_code === 20) {
+      res.json([]);
+    } else {
+      console.error(e);
+      res.status(500).send(e);
+    }
   });
+
 });
 
 module.exports = router;
+
+function bytesToSize(bytes) {
+  var sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+  if (bytes == 0) return '0 Byte';
+  var i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)));
+  return Math.round(bytes / Math.pow(1024, i), 2) + ' ' + sizes[i];
+};

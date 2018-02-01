@@ -61,10 +61,10 @@ paper.app.errorHandlers["401"] = function(jqXHR, textStatus, errorThrown){
 };
 
 // downloads polling
-setInterval(function(){
-    $.get('/downloads')
-        .done(function(json){
-            lastDownloads = json;
-            callbacks.downloadsUpdated(json);
-        });
-}, 1000);
+// setInterval(function(){
+//     $.get('/downloads')
+//         .done(function(json){
+//             lastDownloads = json;
+//             callbacks.downloadsUpdated(json);
+//         });
+// }, 1000);

@@ -13,6 +13,7 @@
     "fast-html-parser": "^1.0.1",
     "jade": "^1.11.0",
     "morgan": "~1.7.0",
+    "rarbg-api": "^1.0.6",
     "serve-favicon": "~2.3.0",
     "utorrent-api": "^0.1.5"
   },
