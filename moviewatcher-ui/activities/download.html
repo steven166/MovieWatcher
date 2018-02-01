@@ -39,10 +39,10 @@
 
       let query = movieMeta.title;
       if(movieMeta.season){
-        query += ' s' + movieMeta.season;
+        query += ' season ' + movieMeta.season;
       }
       if(movieMeta.episode){
-        query += ' e' + movieMeta.episode;
+        query += ' episode ' + movieMeta.episode;
       }
       if(movieMeta.imdb){
         query += '|' + movieMeta.imdb;
@@ -74,7 +74,7 @@
               $("<b class='" + color + "'>" + item.res + "</b>").appendTo(subTitle);
             }
             li.click(function () {
-              activity.post('/downloads', {link: item.link, imdb: query, title: movieMeta.title}).done(function(){
+              activity.post('/downloads', {link: item.link, imdb: query, title: movieMeta.title, path: movieMeta.imdb ? 'movies' : 'series'}).done(function(){
                 paper.toast("Downloading " + movieMeta.title);
               });
             });
