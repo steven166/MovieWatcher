@@ -10,9 +10,6 @@ var rarbgApi = require('rarbg-api')
 var router = express.Router();
 
 router.get('/downloads/search', (req, res, next) => {
-  if (!validate(req.query, res, 'imdb')) {
-    return;
-  }
 
   let type;
   let value;
@@ -22,13 +19,16 @@ router.get('/downloads/search', (req, res, next) => {
   } else if (req.query['tvdb']) {
     type = "tvdb";
     value = req.query['tvdb'];
+  } else if(req.query['themoviedb']) {
+    type = "themoviedb"
+    value = req.query['themoviedb'];
   } else {
     res.status = 400;
     res.send("bad request");
     return;
   }
 
-  rarbgApi.search(value, null, type).then(data => {
+  rarbgApi.search(value, {sort: "seeders", limit: 100, min_seeders: 1}, type).then(data => {
     let result = data.map(item => {
       let resultItem = {
         title: item.title,
@@ -36,7 +36,8 @@ router.get('/downloads/search', (req, res, next) => {
         seeders: item.seeders,
         link: item.download,
         size: bytesToSize(item.size),
-        resultItem: null
+        resultItem: null,
+        category: item.category
       };
 
       let lowerTitle = resultItem.title.toLowerCase();

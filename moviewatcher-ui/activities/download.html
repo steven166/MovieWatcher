@@ -48,45 +48,77 @@
 //        query += '|' + movieMeta.imdb;
 //      }
 
-      var getter = this.get("/downloads/search", {imdb: movieMeta.imdb});
+
+      this.refresh(eActivity, movieMeta, 2);
+
+      return false;
+    };
+
+    this.refresh = function (eActivity, movieMeta, retry) {
+      let search = {};
+      if (movieMeta.imdb) {
+        search.imdb = movieMeta.imdb;
+      } else if (movieMeta.themoviedb) {
+        search.themoviedb = movieMeta.themoviedb;
+      }
+      var getter = this.get("/downloads/search", search);
 
       getter.done(function (json) {
-        var list = paper.list.create(eActivity, function (li, item, isHeader) {
-          if (isHeader) {
-            li.addClass("header").html(item);
-          } else {
-            li.addClass("paper-align medium").addClass("wrippels");
-            var title = $("<div class='title'></div>").appendTo(li);
-            $("<div class='main'></div>").html(item.title).appendTo(title);
-            var subTitle = $("<div class='sub'><div><span class='fg-green'>" + item.seeders + "</span> | <span class='fg-blue'>" + item.leechers + " </span></div></div>").appendTo(title);
-            $("<b>" + item.size + "</b>").appendTo(subTitle);
-            if (item.res != null) {
-              var color = "";
-              if (item.res === "1080p" || item.res === "BRRip") {
-                color = "fg-green";
-              } else if (item.res === "720p" || item.res === "HDRip") {
-                color = "fg-blue";
-              } else if (item.res === "DVD") {
-                color = "fg-orange";
-              } else {
-                color = "fg-red";
-              }
-              $("<b class='" + color + "'>" + item.res + "</b>").appendTo(subTitle);
-            }
-            li.click(function () {
-              activity.post('/downloads', {link: item.link, imdb: query, title: movieMeta.title, path: movieMeta.imdb ? 'movies' : 'series'}).done(function(){
-                paper.toast("Downloading " + movieMeta.title);
-              });
-            });
+        if (typeof(json) !== "object") {
+
+          if (retry > 0) {
+            activity.refresh(eActivity, movieMeta, retry - 1);
           }
-        });
-        if (json.length == 0) {
-          list.render({"No results": []});
         } else {
-          list.render(json);
+          var list = paper.list.create(eActivity, function (li, item, isHeader) {
+            if (isHeader) {
+              li.addClass("header").html(item);
+            } else {
+              li.addClass("paper-align medium").addClass("wrippels");
+              var title = $("<div class='title'></div>").appendTo(li);
+              $("<div class='main'></div>").html(item.title).appendTo(title);
+              var subTitle = $("<div class='sub'><div><span class='fg-green'>" + item.seeders + "</span> | <span class='fg-blue'>" + item.leechers + " </span></div></div>").appendTo(title);
+              $("<b>" + item.size + "</b>").appendTo(subTitle);
+              if (item.res != null) {
+                var color = "";
+                if (item.res === "1080p" || item.res === "BRRip") {
+                  color = "fg-green";
+                } else if (item.res === "720p" || item.res === "HDRip") {
+                  color = "fg-blue";
+                } else if (item.res === "DVD") {
+                  color = "fg-orange";
+                } else {
+                  color = "fg-red";
+                }
+                $("<b class='" + color + "'>" + item.res + "</b>").appendTo(subTitle);
+              }
+              li.click(function (e) {
+                if (e.ctrlKey || e.metaKey) {
+                  window.open(item.link, "_blank");
+                } else {
+                  activity.post('/downloads', {
+                    link: item.link,
+                    imdb: movieMeta.imdbs,
+                    title: movieMeta.title,
+                    path: movieMeta.imdb ? 'movies' : 'series'
+                  }).done(function () {
+                    paper.toast("Downloading " + movieMeta.title);
+                  });
+                }
+              });
+            }
+
+          });
+
+          if (json.length == 0) {
+            list.render({"No results": []});
+          } else {
+            list.render(json);
+          }
+          activity.loaded();
         }
-        activity.loaded();
       });
+
 
       getter.fail(function (xhr) {
         if (xhr.status === 0 && xhr.statusText !== "abort") {
@@ -94,9 +126,10 @@
         } else {
           activity.onError("error", true);
         }
+        if (retry > 0) {
+          activity.refresh(eActivity, movieMeta, retry - 1);
+        }
       });
-
-      return false;
     };
 
     $("body").on("click", "[activity=download] #close-downloads", function () {

@@ -422,6 +422,7 @@
         if(item.imdb_id){
           movieMeta.imdb = item.imdb_id;
         }else{
+          movieMeta.themoviedb = item.id;
           let season = activity.element.find('.serie-download .season').val();
           let episode = activity.element.find('.serie-download .episode').val();
           if(season && season !== 'all'){
