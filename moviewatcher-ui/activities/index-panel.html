@@ -228,6 +228,25 @@
         if (($(this).children().height() - $(this).height() - this.scrollTop) < 600) {
           activity.loadNewPage();
         }
+        let parent = list.element.children().first();
+        parent.children().each((index, item) => {
+          let jqueryObject = $(item);
+          var elementTop = jqueryObject.offset().top;
+          var elementBottom = elementTop + jqueryObject.outerHeight();
+          var viewportTop = jqueryObject.scrollTop();
+          var viewportBottom = viewportTop + parent.height();
+          if (elementBottom > viewportTop - 1000 && elementTop < viewportBottom + 1000) {
+            if(jqueryObject.attr("data-hidden") === "true"){
+              jqueryObject.children().each((index2, child) => $(child).css("display", "inline-block"))
+            }
+            jqueryObject.attr("data-hidden", "false");
+          } else {
+            if(jqueryObject.attr("data-hidden") !== "true"){
+              jqueryObject.children().each((index2, child) => $(child).css("display", "none"))
+            }
+            jqueryObject.attr("data-hidden", "true");
+          }
+        });
       });
 
       return false;
@@ -330,11 +349,11 @@
       loadNewPage();
     });
 
-    $("body").on("click", "[activity=index-panel] #downloads-button", function(){
+    $("body").on("click", "[activity=index-panel] #downloads-button", function () {
       app.overlay("download-list");
     });
 
-    this.loadNewPage = function(){
+    this.loadNewPage = function () {
       if (!reloading) {
         reloading = true;
         var button = activity.element.find('.list-more');
@@ -374,7 +393,7 @@
             $(button).next().addClass("fade");
             reloading = false;
           });
-          getter.fail(function(){
+          getter.fail(function () {
             reloading = false;
           });
         }

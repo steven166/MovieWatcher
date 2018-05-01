@@ -58,8 +58,11 @@
       let search = {};
       if (movieMeta.imdb) {
         search.imdb = movieMeta.imdb;
-      } else if (movieMeta.themoviedb) {
-        search.themoviedb = movieMeta.themoviedb;
+      }
+      if (movieMeta.themoviedb) {
+        search.tv_title = movieMeta.title || movieMeta.themoviedb;
+      } else if (movieMeta.title) {
+        search.movie_title = movieMeta.title;
       }
       var getter = this.get("/downloads/search", search);
 
@@ -98,7 +101,7 @@
                 } else {
                   activity.post('/downloads', {
                     link: item.link,
-                    imdb: movieMeta.imdbs,
+                    imdb: movieMeta.imdb,
                     title: movieMeta.title,
                     path: movieMeta.imdb ? 'movies' : 'series'
                   }).done(function () {

@@ -1,4 +1,4 @@
-FROM node:6
+FROM node:9
 
 ARG PROXY_URL
 RUN npm set registry ${PROXY_URL:-https://registry.npmjs.org/}
